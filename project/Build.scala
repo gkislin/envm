@@ -13,9 +13,9 @@ object ApplicationBuild extends Build {
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
-      scalaVersion := "2.10.1-local",
-      autoScalaLibrary := false,
-      scalaHome := Some(file("d:/scala/scala-2.10.1"))
+//      scalaVersion := "2.10.1-local",
+//      autoScalaLibrary := false,
+//      scalaHome := Some(file("d:/scala/scala-2.10.1"))
     )
 
 }
