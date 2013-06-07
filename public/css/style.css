@@ -1,0 +1,100 @@
+body {
+    color: #222222;
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+    font-size: 12px;
+}
+
+header {
+    padding: 10px 30px;
+    background: #A6C9E2;
+    color: #2E6E9E;
+    font-size: 20px;
+}
+
+section {
+    margin: 8px 0;
+}
+
+button, #submit {
+    border: solid 1px;
+    margin-top: 10px;
+}
+
+input {
+    background-position: 1px 1px;
+    background-repeat: no-repeat;
+    border: solid 1px #A6C9E2;
+    margin: 3px;
+    padding-left: 2px;
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bolder;
+    color: #000000;
+    background-color: #FAFAFA;
+}
+
+h1 {
+    color: white;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+label {
+    display: inline-block;
+    font-size: 12px;
+}
+
+div.heading {
+    height: 30px;
+    background-color: #A6C9E2;
+    padding: 5px 30px;
+}
+
+.detail {
+    margin: 0 0 0 4px;
+    padding: 6px;
+    border: solid 1px #A6C9E2;
+}
+
+dd {
+    display: inline-block;
+    margin-left: 8px
+}
+
+dd.info {
+    display: none;
+}
+
+dd.error {
+    margin-left: 10px;
+    font-size: 12px;
+    color: #c00;
+}
+
+dl {
+    background: #FAFAFA;
+    padding: 0;
+    margin: 5px 0;
+}
+
+dl.error {
+    background: #FBDDE6;
+}
+
+dt {
+    display: inline-block;
+    width: 170px;
+}
+
+select {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+    font-size: 12px;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    color: #A6C9E2;
+    background: #A6C9E2;
+}

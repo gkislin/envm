@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" type="text/javascript"></script>
+	    <link rel="stylesheet" href="css/style.css">
+        <script>
+            // attach grid
+            $(document).ready(function() {
+                var select= $('#config_app')
+                select.change(function() {
+                    alert(this.value);
+                });
+                select.change();
+	        });
+        </script>
+    </head>
+    <body>
+
+        <header>
+            Environments Manager
+        </header>
+        <section>
+
+<div class="detail">
+    
+        <dl>
+            <dt><label for="Cominvest">Cominvest</label></dt>
+            <dd id="Cominvest">
+                
+        <a href='http://accessIp/Cominvest' target="_blank">http://accessIp/Cominvest</a>
+     &nbsp;&nbsp; 
+            </dd>
+        </dl>
+    
+    
+        <dl>
+            <dt><label for="Logs">Logs</label></dt>
+            <dd id="Logs">
+                
+        <a href='http://accessIp/logs' target="_blank">http://accessIp/logs</a>
+
+     &nbsp;&nbsp; 
+            </dd>
+        </dl>
+    
+    
+        <dl>
+            <dt><label for="Tomcat Manager">Tomcat Manager</label></dt>
+            <dd id="Tomcat Manager">
+                
+        <a href='http://accessIp/manager' target="_blank">http://accessIp/manager</a>
+     &nbsp;&nbsp; (login/passw)
+            </dd>
+        </dl>
+    
+    
+        <dl>
+            <dt><label for="Bonita">Bonita</label></dt>
+            <dd id="Bonita">
+                
+        <a href='http://accessIp/bonita' target="_blank">http://accessIp/bonita</a>
+     &nbsp;&nbsp; 
+            </dd>
+        </dl>
+    
+
+
+        <dl>
+            <dt><label for="Config">
+<select id="config_app" style="width:90">
+    <option value="template">Template</option>
+    <option value="mail">Mail</option>
+    <option value="attach">Attach</option>
+</select>&nbsp;&nbsp;config</label>
+</dt>
+            <dd id="Config">
+ <a href=javascript:void(0) onclick="newLocation('tomcat', document.getElementById('app_name').value+'/config')">Show config</a><br>                
+            </dd>
+        </dl>
+
+
+
+    <br>
+    
+        <dl>
+            <dt><label for="WSO2 manager">WSO2 manager</label></dt>
+            <dd id="WSO2 manager">
+                
+        <a href='https://accessIp:9446/carbon' target="_blank">https://accessIp:9446/carbon</a>
+     &nbsp;&nbsp; (admin/admin)
+            </dd>
+        </dl>
+    
+</div>
+        </section>
+    </body>
+</html>

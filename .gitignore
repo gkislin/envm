@@ -1,0 +1,10 @@
+.idea
+.idea_modules
+idea.bat
+logs
+project/project
+project/target
+target
+tmp
+env.json
+

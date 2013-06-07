@@ -1,0 +1,66 @@
+@(env: Env)
+
+    @link(href: String) = {
+        <a href='@href' target="_blank">@href</a>
+    }
+    @dl(label: String, href: String, add: String = "") = {
+        @if(href!="") {
+            <dl>
+                <dt><label for="@label">@label</label></dt>
+                <dd id="@label">
+                  @link(href)&nbsp;@add
+                </dd>
+            </dl>
+        }
+    }
+
+<div id="detailEnv" class="detail">
+    @dl(env.ctx.capitalize, env.url("http", env.tomcat, env.ctx))
+    @dl("Tomcat Manager", env.url("http", env.tomcat, "manager"), "(admin/passw)")
+    @if(env.name!="build") {
+        @dl("Logs", env.url("http", env.tomcat, "logs"))
+        @dl("Bonita", env.url("http", env.tomcat, "bonita"), "(admin/bpm)")
+        <dl>
+            <dt><label>
+                <select id="config_app" style="width:90px">
+                    <option value="template">Template</option>
+                    <option value="mail">Mail</option>
+                    <option value="attach">Attach</option>
+                </select>&nbsp;&nbsp;config</label>
+            </dt>
+            <dd id="config"></dd>
+        </dl>
+
+        <hr>
+        @dl("WSO2 manager", env.url("https", env.wso2, "carbon"), "(admin/admin)")
+        <dl>
+            <dt><label>
+                Wso2 DBS: <input type="text" id="dbsName" value="ecm" size="13"/></label>
+            </dt>
+            <dd id="wsdl"></dd>
+        </dl>
+    }
+    <hr>
+    @dl("PgSql", env.url("jdbc:postgresql", env.psql, "rdb"), "(user/passw)")
+    <hr>
+    @dl("SSH", s"ssh -p ${env.ssh} ${env.user}@${Env.accessIp}")
+</div>
+<script>
+    $("#detailEnv").ready(function() {
+        var select= $("#config_app");
+        select.change(function() {
+            var href="@env.url("http", env.tomcat, "")" + this.value + "/config";
+            $("#config").html("<a href='"+href+"' target='_blank'>"+href+"</a>");
+        });
+        select.change();
+        var dbsName = $("#dbsName");
+        dbsName.keyup(function() {
+            var href="@env.url("http", env.wsdl, "")" + "services/" + this.value;
+            var tryItRef = href+"?tryit";
+            var wsdlRef = href+"?wsdl";
+            $("#wsdl").html("TryIt:&nbsp;&nbsp;<a href='"+tryItRef+"' target='_blank'>"+tryItRef+"</a><br>" +
+                            " Wsdl:&nbsp;&nbsp;<a href='"+wsdlRef+"' target='_blank'>"+wsdlRef+"</a>");
+        });
+        dbsName.keyup();
+    });
+</script>

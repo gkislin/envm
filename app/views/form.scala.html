@@ -1,0 +1,40 @@
+@(envForm: Form[Env])
+
+    @helper.form(action = routes.Application.envs, 'id -> "evnDetail") {
+        @helper.inputText(
+            field = envForm("name"),
+            'disabled -> "disabled ", '_label -> "Name", 'size -> 15
+        )
+        @helper.inputText(
+            field = envForm("descr"),
+            'disabled -> "disabled ", '_label -> "Description", 'size -> 45
+        )
+        @helper.inputText(
+            field = envForm("version"),
+            'disabled -> "disabled ", '_label -> "Version", 'size -> 15
+        )
+        @helper.inputText(
+            field = envForm("tomcat"),
+            'disabled -> "disabled ", '_label -> "Tomcat port", 'size -> 5
+        )
+        @helper.inputText(
+            field = envForm("wso2"),
+            'disabled -> "disabled ", '_label -> "Wso2 port", 'size -> 5
+        )
+        @helper.inputText(
+            field = envForm("wsdl"),
+            'disabled -> "disabled ", '_label -> "Wsdl port", 'size -> 5
+        )
+        @helper.inputText(
+            field = envForm("psql"),
+            'disabled -> "disabled ", '_label -> "DB port", 'size -> 5
+        )
+        @helper.inputText(
+            field = envForm("ssh"),
+            'disabled -> "disabled ", '_label -> "SSH port", 'size -> 5
+        )
+        @helper.inputText(
+            field = envForm("ip"),
+            'disabled -> "disabled ", '_label -> "IP", 'size -> 14
+        )
+    }
