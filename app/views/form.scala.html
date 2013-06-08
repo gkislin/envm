@@ -1,40 +1,40 @@
-@(envForm: Form[Env])
+@(vhostForm: Form[VHost], serverName: String)
 
-    @helper.form(action = routes.Application.envs, 'id -> "evnDetail") {
+    @helper.form(action = routes.Application.vhosts(serverName), 'id -> "evnDetail") {
         @helper.inputText(
-            field = envForm("name"),
+            field = vhostForm("name"),
             'disabled -> "disabled ", '_label -> "Name", 'size -> 15
         )
         @helper.inputText(
-            field = envForm("descr"),
+            field = vhostForm("descr"),
             'disabled -> "disabled ", '_label -> "Description", 'size -> 45
         )
         @helper.inputText(
-            field = envForm("version"),
+            field = vhostForm("version"),
             'disabled -> "disabled ", '_label -> "Version", 'size -> 15
         )
         @helper.inputText(
-            field = envForm("tomcat"),
+            field = vhostForm("tomcat"),
             'disabled -> "disabled ", '_label -> "Tomcat port", 'size -> 5
         )
         @helper.inputText(
-            field = envForm("wso2"),
+            field = vhostForm("wso2"),
             'disabled -> "disabled ", '_label -> "Wso2 port", 'size -> 5
         )
         @helper.inputText(
-            field = envForm("wsdl"),
+            field = vhostForm("wsdl"),
             'disabled -> "disabled ", '_label -> "Wsdl port", 'size -> 5
         )
         @helper.inputText(
-            field = envForm("psql"),
+            field = vhostForm("psql"),
             'disabled -> "disabled ", '_label -> "DB port", 'size -> 5
         )
         @helper.inputText(
-            field = envForm("ssh"),
+            field = vhostForm("ssh"),
             'disabled -> "disabled ", '_label -> "SSH port", 'size -> 5
         )
         @helper.inputText(
-            field = envForm("ip"),
+            field = vhostForm("ip"),
             'disabled -> "disabled ", '_label -> "IP", 'size -> 14
         )
     }

@@ -5,6 +5,8 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
+import models._
+import Env._
 
 import views._
 
@@ -15,7 +17,7 @@ object Application extends Controller {
   /**
    * Describes the hello form.
    */
-  val envForm: Form[Env] = Form(
+  val vhostForm: Form[VHost] = Form(
     mapping(
       "name" -> nonEmptyText,
       "descr" -> nonEmptyText,
@@ -29,26 +31,27 @@ object Application extends Controller {
         pattern( """\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b""".r, error = "Wrong IP")),
       "ctx" -> nonEmptyText,
       "user" -> nonEmptyText
-    )(Env.apply)(Env.unapply)
+    )(VHost.apply)(VHost.unapply)
   )
 
   // -- Actions
 
   def index = Action {
-    Ok(html.index("Environments Manager"))
+    Ok(html.index("Environment Manager", "Server1"))
   }
 
-  def env(name: String) = Action {
-    Ok(html.detailEnv(EnvJson.envs.filter(_.name == name)(0)))
+  def vhost(serverName: String, name: String) = Action {
+    Ok(
+      html.detailEnv(Env.vhost(serverName, name)))
   }
 
-  def envs = Action {
-    Ok(EnvJson.jsonValue).as(JSON)
+  def vhosts(serverName: String) = Action {
+    Ok(toJsonStr(Env.vhosts(serverName))).as(JSON)
   }
 
   def reload = Action {
-    EnvJson.reload()
-    Ok(EnvJson.jsonValue).as(JSON)
+    Env.reload()
+    Ok(Env.jsonValue).as(JSON)
   }
 
   def javascriptRoutes() = Action {
@@ -56,7 +59,7 @@ object Application extends Controller {
       Ok(
         Routes.javascriptRouter("jsRoutes")(
           // Routers
-          routes.javascript.Application.env
+          routes.javascript.Application.vhost
         )
       ).as(JAVASCRIPT)
   }

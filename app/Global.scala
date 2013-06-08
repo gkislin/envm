@@ -3,7 +3,6 @@
  * Date: 05.06.13
  */
 
-import models.EnvJson
 import play.api._
 
 object Global extends GlobalSettings {

@@ -1,4 +1,4 @@
-@(title: String)
+@(title: String, serverName: String)
 
 <!DOCTYPE html>
 <html>
@@ -21,7 +21,7 @@
             // attach grid
             $(document).ready(function() {
                 jQuery(dataTable).jqGrid({
-                    url: "@routes.Application.envs()",
+                    url: "@routes.Application.vhosts(serverName)",
                     datatype: "json",
                     height: 'auto',
                     colNames:['Name','Description','','','','','','',''],
@@ -45,9 +45,9 @@
                            lastSel=id;
                         }
                         var name = jQuery(this).getRowData(lastSel)['name'];
-//                      populateForm('#evnDetail', env);
+//                      populateForm('#evnDetail', vhost);
 
-                        jsRoutes.controllers.Application.env(name).ajax({
+                        jsRoutes.controllers.Application.vhost('@serverName', name).ajax({
                             success: function(data) {
                                 $("#detail").html(data);
                             },
