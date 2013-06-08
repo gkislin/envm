@@ -5,7 +5,7 @@ import org.specs2.mutable._
  * User: gkislin
  * Date: 04.06.13
  */
-class EnvJsonSpec extends Specification {
+class EnvSpec extends Specification {
 
   EnvJson.loadEnv should {
     "contain 11 characters" in {

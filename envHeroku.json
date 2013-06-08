@@ -1,0 +1,102 @@
+{
+    "accessIp": "127.0.0.1",
+    "servers": [
+        {
+            "name": "Server1",
+            "descr": "Server #1",
+            "ssh": 22,
+            "ip": "127.0.0.1",
+            "user": "serveruser",
+            "vhosts": [
+                {
+                    "name": "dev",
+                    "descr": "Разработка (trunk)",
+                    "version": "DEV_VERSION",
+                    "tomcat": 7473,
+                    "wso5": 7444,
+                    "wsdl": 7763,
+                    "psql": 5346,
+                    "ssh": 5544,
+                    "ip": "175.168.56.14",
+                    "ctx": "App1",
+                    "user": "user"
+                },
+                {
+                    "name": "build",
+                    "descr": "Jenkins",
+                    "tomcat": 7313,
+                    "ssh": 5541,
+                    "psql": 5333,
+                    "ip": "175.168.56.11",
+                    "ctx": "jenkins",
+                    "user": "user"
+                },
+                {
+                    "name": "nightly",
+                    "descr": "Ночной деплой",
+                    "version": "DEV_VERSION",
+                    "tomcat": 7475,
+                    "wso5": 7446,
+                    "wsdl": 7765,
+                    "psql": 5348,
+                    "ssh": 5513,
+                    "ip": "175.168.56.15",
+                    "ctx": "App5",
+                    "user": "user"
+                },
+                {
+                    "name": "ext",
+                    "descr": "Для тестов-экспириментов разработчиков",
+                    "version": "DEV_VERSION",
+                    "tomcat": 7474,
+                    "wso5": 7445,
+                    "wsdl": 7766,
+                    "psql": 5347,
+                    "ssh": 5515,
+                    "ip": "175.168.56.16",
+                    "ctx": "App3",
+                    "user": "user"
+                },
+                {
+                    "name": "test",
+                    "descr": "Тестирование новой версии в нашем окружении",
+                    "version": "TEST_VERSION",
+                    "tomcat": 7471,
+                    "wso5": 7443,
+                    "wsdl": 7764,
+                    "psql": 5345,
+                    "ssh": 5545,
+                    "ip": "175.168.56.15",
+                    "ctx": "App1",
+                    "user": "user"
+                },
+                {
+                    "name": "demo",
+                    "descr": "Демо для заказчика",
+                    "version": "TEST_VERSION",
+                    "tomcat": 7476,
+                    "wso5": 7447,
+                    "wsdl": 7771,
+                    "psql": 5347,
+                    "ssh": 5515,
+                    "ip": "175.168.56.18",
+                    "ctx": "App5",
+                    "user": "user"
+                },
+                {
+                    "name": "app13",
+                    "descr": "Тест 13",
+                    "version": "1.8",
+                    "tomcat": 18484,
+                    "wso5": 17443,
+                    "wsdl": 17763,
+                    "psql": 15435,
+                    "ssh": 14455,
+                    "ip": "175.168.56.13",
+                    "ctx": "App13",
+                    "user": "user"
+                }
+            ]
+        }
+    ]
+}
