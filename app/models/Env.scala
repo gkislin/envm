@@ -30,9 +30,9 @@ object Env {
 
   def parse(): Env = Json.parse(loadEnv).as[Env]
 
-  def toJsonStr[T](list: List[T])(implicit w: Format[T]): String = Json.stringify(JsArray(list.map(toJson(_)).toSeq))
+  def toJsonStr[T](iterable: Iterable[T])(implicit w: Format[T]): String = Json.stringify(JsArray(iterable.map(toJson(_)).toSeq))
 
-  def toJsonStr[T](o: T)(implicit w: Format[T]): String = Json.stringify(w.writes(o))
+  def toJsonStr[T](o: T)(implicit w: Format[T]): String = Json.stringify(toJson(o))
 
   def url(protocol: String, port: Option[port], path: String): String = port match {
     case Some(p) => url(protocol, p, path)
