@@ -1,16 +1,22 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET	/       controllers.Application.index
-
-# Envs list
-GET     /vhosts/:serverName           controllers.Application.vhosts(serverName)
+GET	/                                 controllers.Application.index
 
 # Reload
 GET     /reload                       controllers.Application.reload
 
-# Env detail
-GET     /vhost/:serverName/:name      controllers.Application.vhost(serverName, name)
+# VHosts list
+GET     /servers/json                 controllers.Application.servers
+
+# Server detail
+GET     /server/:serverName           controllers.Application.serverDetail(serverName)
+
+# VHosts list
+GET     /vhosts/json/:serverName      controllers.Application.vhosts(serverName)
+
+# VHostDetail detail
+GET     /server/:serverName/:name      controllers.Application.vhostDetail(serverName, name)
 
 # Javascript routing
 GET    /assets/javascripts/routes     controllers.Application.javascriptRoutes()

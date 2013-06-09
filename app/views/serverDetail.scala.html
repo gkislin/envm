@@ -1,0 +1,11 @@
+@(server: Server)
+
+
+<div class="detail">
+    @dl("IP") {
+        @server.ip
+    }
+    @dl("SSH") {
+        @Env.ssh(server)
+    }
+</div>

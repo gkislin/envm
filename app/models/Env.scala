@@ -3,7 +3,6 @@ package models
 import play.api.libs.json._
 import play.api.libs.json.Json._
 import play.api.libs.json.JsArray
-import scala.Some
 
 object Env {
   type port = Int
@@ -24,20 +23,17 @@ object Env {
 
   def servers(): List[Server] = env.servers
 
-  def vhost(serverName: String, name: String): VHost = vhosts(serverName).filter(_.name == name)(0)
+  def server(serverName: String): Server = servers().filter(_.name == serverName)(0)
 
-  def vhosts(serverName: String): List[VHost] = env.servers.filter(_.name == serverName)(0).vhosts
+  def vhosts(serverName: String): List[VHost] = server(serverName).vhosts
+
+  def vhost(serverName: String, name: String): VHost = vhosts(serverName).filter(_.name == name)(0)
 
   def parse(): Env = Json.parse(loadEnv).as[Env]
 
-  def toJsonStr[T](iterable: Iterable[T])(implicit w: Format[T]): String = Json.stringify(JsArray(iterable.map(toJson(_)).toSeq))
+  def toJsonStr[T](iterable: Iterable[T])(implicit w: Writes[T]): String = Json.stringify(JsArray(iterable.map(toJson(_)).toSeq))
 
-  def toJsonStr[T](o: T)(implicit w: Format[T]): String = Json.stringify(toJson(o))
-
-  def url(protocol: String, port: Option[port], path: String): String = port match {
-    case Some(p) => url(protocol, p, path)
-    case None => ""
-  }
+  def toJsonStr[T](o: T)(implicit w: Writes[T]): String = Json.stringify(toJson(o))
 
   def url(protocol: String, port: port, path: String): String = s"$protocol://${env.accessIp}:$port/$path"
 

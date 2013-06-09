@@ -37,12 +37,21 @@ object Application extends Controller {
   // -- Actions
 
   def index = Action {
-    Ok(html.index("Environment Manager", "Server1"))
+    Ok(html.index("Environment Manager"))
   }
 
-  def vhost(serverName: String, name: String) = Action {
+  def serverDetail(serverName: String) = Action {
     Ok(
-      html.detailEnv(Env.vhost(serverName, name)))
+      html.serverDetail(Env.server(serverName)))
+  }
+
+  def vhostDetail(serverName: String, name: String) = Action {
+    Ok(
+      html.vhostDetail(Env.vhost(serverName, name)))
+  }
+
+  def servers = Action {
+    Ok(toJsonStr(Env.servers)).as(JSON)
   }
 
   def vhosts(serverName: String) = Action {
@@ -51,7 +60,7 @@ object Application extends Controller {
 
   def reload = Action {
     Env.reload()
-    Ok(Env.jsonValue).as(JSON)
+    Ok(toJsonStr(Env.servers)).as(JSON)
   }
 
   def javascriptRoutes() = Action {
@@ -59,7 +68,9 @@ object Application extends Controller {
       Ok(
         Routes.javascriptRouter("jsRoutes")(
           // Routers
-          routes.javascript.Application.vhost
+          routes.javascript.Application.serverDetail,
+          routes.javascript.Application.vhostDetail,
+          routes.javascript.Application.vhosts
         )
       ).as(JAVASCRIPT)
   }

@@ -1,0 +1,5 @@
+@(protocol: String, port: Env.port, path: String)
+
+@defining(Env.url(protocol, port, path)) { href =>
+    <a href='@href' target="_blank">@href</a>
+}

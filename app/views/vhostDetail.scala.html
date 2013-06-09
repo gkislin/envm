@@ -1,25 +1,12 @@
 @(vhost: VHost)
 
-    @link(href: String) = {
-        <a href='@href' target="_blank">@href</a>
-    }
-    @dl(label: String, href: String, add: String = "") = {
-        @if(href!="") {
-            <dl>
-                <dt><label for="@label">@label</label></dt>
-                <dd id="@label">
-                  @link(href)&nbsp;@add
-                </dd>
-            </dl>
-        }
-    }
 
 <div id="detailEnv" class="detail">
-    @dl(vhost.ctx.capitalize, Env.url("http", vhost.tomcat, vhost.ctx))
-    @dl("Tomcat Manager", Env.url("http", vhost.tomcat, "manager"), "(admin/passw)")
+    @dlUrl(vhost.ctx.capitalize, "http", vhost.tomcat, vhost.ctx)
+    @dlUrl("Tomcat Manager", "http", vhost.tomcat, "manager", "(admin/passw)")
     @if(vhost.name!="build") {
-        @dl("Logs", Env.url("http", vhost.tomcat, "logs"))
-        @dl("Bonita", Env.url("http", vhost.tomcat, "bonita"), "(admin/bpm)")
+        @dlUrl("Logs", "http", vhost.tomcat, "logs")
+        @dlUrl("Bonita", "http", vhost.tomcat, "bonita", "(admin/bpm)")
         <dl>
             <dt><label>
                 <select id="config_app" style="width:90px">
@@ -31,19 +18,26 @@
             <dd id="config"></dd>
         </dl>
 
-        <hr>
-        @dl("WSO2 manager", Env.url("https", vhost.wso2, "carbon"), "(admin/admin)")
-        <dl>
-            <dt><label>
-                Wso2 DBS: <input type="text" id="dbsName" value="ecm" size="13"/></label>
-            </dt>
-            <dd id="wsdl"></dd>
-        </dl>
+        @vhost.wso2 match {
+            case Some(wso2) => {
+                <hr>
+                @dlUrl("WSO2 manager", "https", wso2, "carbon", "(admin/admin)")
+                <dl>
+                    <dt><label>
+                        Wso2 DBS: <input type="text" id="dbsName" value="ecm" size="13"/></label>
+                    </dt>
+                    <dd id="wsdl"></dd>
+                </dl>
+            }
+            case None => { }
+        }
     }
     <hr>
-    @dl("PgSql", Env.url("jdbc:postgresql", vhost.psql, "rdb"), "(user/passw)")
+    @dlUrl("PgSql", "jdbc:postgresql", vhost.psql, "rdb", "(user/passw)")
     <hr>
-    @dl("SSH", Env.ssh(vhost))
+    @dl("SSH"){
+        @Env.ssh(vhost)
+    }
 </div>
 <script>
     $("#detailEnv").ready(function() {
@@ -55,7 +49,7 @@
         select.change();
         var dbsName = $("#dbsName");
         dbsName.keyup(function() {
-            var href="@Env.url("http", vhost.wsdl, "")" + "services/" + this.value;
+            var href="@Env.url("http", vhost.wsdl.getOrElse(0), "")" + "services/" + this.value;
             var tryItRef = href+"?tryit";
             var wsdlRef = href+"?wsdl";
             $("#wsdl").html("TryIt:&nbsp;&nbsp;<a href='"+tryItRef+"' target='_blank'>"+tryItRef+"</a><br>" +

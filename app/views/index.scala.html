@@ -1,4 +1,4 @@
-@(title: String, serverName: String)
+@(title: String)
 
 <!DOCTYPE html>
 <html>
@@ -16,80 +16,128 @@
         <script type="text/javascript" src="@routes.Application.javascriptRoutes"></script>
 
         <script>
-            var lastSel = 1;
-
-            // attach grid
+            var lastServerSel = -1;
+            var lastVhostSel = -1;
+            var serverName;
             $(document).ready(function() {
-                jQuery(dataTable).jqGrid({
-                    url: "@routes.Application.vhosts(serverName)",
+                $(serverTable).jqGrid({
+                    url: "@routes.Application.servers",
                     datatype: "json",
                     height: 'auto',
-                    colNames:['Name','Description','','','','','','',''],
+                    colNames:['Name','Description'],
                     colModel:[
                         {name:'name',index:'name', width:100},
-                        {name:'descr',index:'descr', width:280},
-                        {name:'version',hidden: true},
-                        {name:'tomcat',hidden: true},
-                        {name:'wso2',hidden: true},
-                        {name:'wsdl',hidden: true},
-                        {name:'psql',hidden: true},
-                        {name:'ssh',hidden: true},
-                        {name:'ip',hidden: true}
+                        {name:'descr',index:'descr', width:280}
                     ],
                     viewrecords: true,
                     loadonce: true,
-                    caption: "VirtualHosts",
+                    caption: "Servers",
                     onSelectRow: function(id){
-                        if(id && id!==lastSel){
-                           $(this).restoreRow(lastSel);
-                           lastSel=id;
+                        if(id && id!==lastServerSel){
+                           $(this).restoreRow(lastServerSel);
+                           lastServerSel=id;
+                           serverName = $(this).getRowData(lastServerSel)['name'];
+                           jsRoutes.controllers.Application.serverDetail(serverName).ajax({
+                                success: function(data) {
+                                    $("#serverDetail").html(data);
+                                    lastVhostSel = -1;
+                                    $("#vhostDetail").empty()
+                                    jsRoutes.controllers.Application.vhosts(serverName).ajax({
+                                        success: function(gridData) {
+                                            reloadGrid("#vhostTable", gridData);
+                                            $("#vhosts").show()
+                                        },
+                                        error: showServerError
+                                    });
+                                },
+                                error: showServerError
+                           });
                         }
-                        var name = jQuery(this).getRowData(lastSel)['name'];
-//                      populateForm('#evnDetail', vhost);
-
-                        jsRoutes.controllers.Application.vhost('@serverName', name).ajax({
-                            success: function(data) {
-                                $("#detail").html(data);
-                            },
-                            error: showError
-                        });
                     }
                 });
                 $("#reloadBtn").click(function(){
-                    $.get("@routes.Application.reload()", "", reloadGrid).fail(showError);
+                    $.get("@routes.Application.reload()", "",
+                        function (gridData){
+                            reloadGrid("#serverTable", gridData);
+                            $("#serverDetail").empty()
+                            $("#vhosts").hide()
+                            lastServerSel = -1;
+                        }
+                    ).fail(showServerError);
                 });
+                $("#vhostTable").jqGrid({
+                    datatype: "local",
+                    height: 'auto',
+                    colNames:['Name','Description'],
+                    colModel:[
+                        {name:'name',index:'name', width:100},
+                        {name:'descr',index:'descr', width:280}
+                    ],
+                    viewrecords: true,
+                    loadonce: true,
+                    caption: "Virtual Hosts",
+                    onSelectRow: function(id){
+                        if(id && id!==lastVhostSel){
+                           $(this).restoreRow(lastVhostSel);
+                           lastVhostSel=id;
+                           var vhostName = $(this).getRowData(lastVhostSel)['name'];
+                           jsRoutes.controllers.Application.vhostDetail(serverName, vhostName).ajax({
+                                success: function(data) {
+                                    $("#vhostDetail").html(data);
+                                },
+                                error: showVhostError
+                           });
+                        }
+                    }
+                });
+                $("#vhosts").hide()
             });
 
-            function showError(errorData){
-                $("#detail").html(errorData.responseText);
+            function showServerError(errorData){
+                $("#vhosts").hide()
+                $("#serverDetail").html(errorData.responseText);
             }
-            function reloadGrid(gridData){
-                $("#dataTable").jqGrid('setGridParam', {data: gridData}).trigger('reloadGrid');
-                $("#detail").empty()
+            function showVhostError(errorData){
+                $("#vhostDetail").html(errorData.responseText);
             }
-            function populateForm(frm, data) {
-                $.each(data, function(key, value){
-                    $('[name='+key+']', frm).val(value);
-                });
+            function reloadGrid(gridId, gridData){
+              $(gridId).jqGrid('clearGridData');
+              $(gridId).jqGrid('setGridParam', {data: gridData}).trigger('reloadGrid');
             }
         </script>
     </head>
     <body>
         <header>@title</header>
         <section>
+            <div id="servers">
             <table>
                 <tr>
                     <td style="vertical-align: top">
                         <div>
-                            <table id="dataTable"></table>
+                            <table id="serverTable"></table>
                             <button id="reloadBtn">Reload</button>
                         </div>
                     </td>
                     <td style="vertical-align: top">
-                        <div id="detail"></div>
+                        <div id="serverDetail"></div>
                     </td>
                 </tr>
             </table>
+            </div>
+            <div id="vhosts">
+                <table>
+                    <tr>
+                        <td style="vertical-align: top">
+                            <div>
+                                <table id="vhostTable"></table>
+                            </div>
+                        </td>
+                        <td style="vertical-align: top">
+                            <div id="vhostDetail"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </section>
     </body>
 </html>
