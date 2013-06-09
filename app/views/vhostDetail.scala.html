@@ -1,5 +1,6 @@
 @(vhost: VHost)
 
+@import common._
 
 <div id="detailEnv" class="detail">
     @dlUrl(vhost.ctx.capitalize, "http", vhost.tomcat, vhost.ctx)
