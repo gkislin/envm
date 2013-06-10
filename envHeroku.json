@@ -114,7 +114,7 @@
                     "psql": 2226,
                     "ssh": 2222,
                     "ip": "10.10.10.221",
-                    "ctx": "Cominvest",
+                    "ctx": "Preprod",
                     "user": "user"
                 },
                 {
@@ -126,7 +126,7 @@
                     "psql": 2222,
                     "ssh": 2222,
                     "ip": "10.10.10.228",
-                    "ctx": "Cominvest",
+                    "ctx": "Testprod",
                     "user": "user"
                 },
                 {
@@ -138,7 +138,7 @@
                     "psql": 2222,
                     "ssh": 2223,
                     "ip": "10.10.10.223",
-                    "ctx": "Cominvest",
+                    "ctx": "Newprod",
                     "user": "user"
                 },
                 {
@@ -150,7 +150,7 @@
                     "psql": 2227,
                     "ssh": 2222,
                     "ip": "10.10.10.229",
-                    "ctx": "Cominvest",
+                    "ctx": "Loadprod",
                     "user": "user"
                 }
             ]
