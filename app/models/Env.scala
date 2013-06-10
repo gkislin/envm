@@ -40,7 +40,7 @@ object Env {
 
   def url(protocol: String, port: port, path: String): String = s"$protocol://${env.accessIp}:$port/$path"
 
-  def ssh(host: Host) = s"ssh -p ${host.ssh} ${host.user}@${env.accessIp}"
+  def ssh(host: Host, ip: String= env.accessIp) = s"ssh -p ${host.ssh} ${host.user}@$ip"
 
   def reload() {
     env = parse()
