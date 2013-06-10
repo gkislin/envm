@@ -154,6 +154,48 @@
                     "user": "user"
                 }
             ]
+        },
+        {
+            "name": "prod",
+            "descr": "Customer prod Server",
+            "ssh": 2322,
+            "ip": "333.333.333.333",
+            "user": "produser",
+            "vhosts": [
+                {
+                    "name": "prod",
+                    "descr": "Продакшен",
+                    "tomcat": 3223,
+                    "wso2": 9490,
+                    "wsdl": 9270,
+                    "psql": 5437,
+                    "ssh": 2211,
+                    "ip": "10.10.10.214",
+                    "ctx": "prod",
+                    "user": "produser"
+                }
+            ]
+        },
+        {
+            "name": "prodEcm Server",
+            "descr": "тунель к prodEcm Server",
+            "ssh": 47100,
+            "ip": "444.44.4.4",
+            "user": "user",
+            "vhosts": [
+                {
+                    "name": "prodEcm",
+                    "descr": "ECM продакшен",
+                    "tomcat": 15080,
+                    "wso2": 29343,
+                    "wsdl": 29963,
+                    "psql": 25132,
+                    "ssh": 20422,
+                    "ip": "192.168.10.13",
+                    "ctx": "ecm",
+                    "user": "user"
+                }
+            ]
         }
     ]
 }
