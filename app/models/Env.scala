@@ -3,6 +3,7 @@ package models
 import play.api.libs.json._
 import play.api.libs.json.Json._
 import play.api.libs.json.JsArray
+import play.api.Play
 
 object Env {
   type port = Int
@@ -14,12 +15,14 @@ object Env {
   var jsonValue: String = toJsonStr(env)
 
   def loadEnv: String = {
-//    val source = scala.io.Source.fromFile("env.json", "UTF-8")
-    val source = scala.io.Source.fromFile("envHeroku.json", "UTF-8")
+    //    val source = scala.io.Source.fromFile("env.json", "UTF-8")
+    val source = scala.io.Source.fromFile(envConfigName, "UTF-8")
     val lines = source.getLines().mkString("\n")
     source.close()
     lines
   }
+
+  def envConfigName(): String = Play.current.configuration.getString("env.config").getOrElse("env.json")
 
   def servers(): List[Server] = env.servers
 
@@ -56,7 +59,7 @@ trait Host {
 case class Env(accessIp: String, servers: List[Server])
 
 case class Server(name: String, descr: String, ssh: Env.port, ip: String, user: String,
-                  vhosts: List[VHost] = Nil) extends Host
+                  vhosts: List[VHost]) extends Host
 
 case class VHost(name: String, descr: String, version: Option[String],
                  tomcat: Env.port,
