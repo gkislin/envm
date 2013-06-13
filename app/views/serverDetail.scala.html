@@ -3,9 +3,6 @@
 @import common._
 
 <div class="detail">
-    @dl("Ip") {
-        @server.ip
-    }
     @dl("SSH") {
         @Env.ssh(server, server.ip)
     }

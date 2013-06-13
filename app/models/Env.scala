@@ -5,32 +5,33 @@ import play.api.libs.json.Json._
 import play.api.libs.json.JsArray
 import play.api.Play
 
+import Config._
+import java.io.{PrintWriter, InputStreamReader, FileInputStream}
+import java.util.Properties
+import resource._
+
 object Env {
   type port = Int
   implicit val vhostFormat: Format[VHost] = Json.format[VHost]
+  implicit val extVhostFormat: Format[ExtVHost] = Json.format[ExtVHost]
   implicit val serverFormat: Format[Server] = Json.format[Server]
   implicit val envFormat: Format[Env] = Json.format[Env]
 
-  var env: Env = parse()
-  var jsonValue: String = toJsonStr(env)
+  var env: Env = _
+  var serversJson: String = _
+  var extVHosts: List[ExtVHost] = _
+  reload()
 
-  def loadEnv: String = {
-    //    val source = scala.io.Source.fromFile("env.json", "UTF-8")
-    val source = scala.io.Source.fromFile(envConfigName, "UTF-8")
-    val lines = source.getLines().mkString("\n")
-    source.close()
-    lines
-  }
+  def loadEnv: String =
+    managed(scala.io.Source.fromFile(envConfigName, "UTF-8")).acquireAndGet {
+      source => source.getLines().mkString("\n")
+    }
 
-  def envConfigName(): String = Play.current.configuration.getString("env.config").getOrElse("env.json")
+  def server(serverName: String): Server = env.servers.find(_.name == serverName).get
 
-  def servers(): List[Server] = env.servers
+  def vhost(serverName: String, name: String): VHost = server(serverName).vhosts.find(_.name == name).get
 
-  def server(serverName: String): Server = servers().filter(_.name == serverName)(0)
-
-  def vhosts(serverName: String): List[VHost] = server(serverName).vhosts
-
-  def vhost(serverName: String, name: String): VHost = vhosts(serverName).filter(_.name == name)(0)
+  def serverHosts(serverName: String): Seq[ExtVHost] = extVHosts.filter(_.serverName == serverName)
 
   def parse(): Env = Json.parse(loadEnv).as[Env]
 
@@ -40,13 +41,53 @@ object Env {
 
   def url(protocol: String, port: port, path: String): String = s"$protocol://${env.accessIp}:$port/$path"
 
-  def ssh(host: Host, ip: String= env.accessIp) = s"ssh -p ${host.ssh} ${host.user}@$ip"
+  def ssh(host: Host, ip: String = env.accessIp) = s"ssh -p ${host.ssh} ${host.user}@$ip"
 
   def reload() {
     env = parse()
-    jsonValue = toJsonStr(env)
+    serversJson = toJsonStr(env.servers)
+    extVHosts =
+      for (server <- env.servers; vhost <- server.vhosts)
+      yield ExtVHost(vhost.name, vhost.descr, getVersion(vhost.name), server.name)
   }
 }
+
+object Config {
+  private val versionFile = "version.conf"
+
+  val props: Properties = managed(new InputStreamReader(new FileInputStream(versionFile), "UTF8")).acquireAndGet {
+    val p = new Properties()
+    in => p.load(in)
+      p
+  }
+
+  def envConfigName() = getFromConf("env.config", "env.json")
+
+  def getFromConf(name: String, default: String): String = getFromConf(name, "%s", default)
+
+  def getFromConf(name: String, pattern: => String, default: String): String = Play.current.configuration.getString(name) match {
+    case Some(value) => pattern.format(value)
+    case None => default
+  }
+
+  def getVersion(name: String): String = props.getProperty(name + ".version", "undefined")
+
+  def setVersion(name: String, version: String): String = {
+    val host: ExtVHost = Env.extVHosts.find(_.name == name).get
+    if (host.version != version) {
+      host.version = version
+      props.setProperty(name + ".version", version)
+      val comment = s"Set $name.version=$version"
+      managed(new PrintWriter(versionFile, "UTF-8")).acquireAndGet {
+        out => props.store(out, comment)
+      }
+      comment
+    } else {
+      "Version unchanged"
+    }
+  }
+}
+
 
 trait Host {
   val name: String
@@ -61,8 +102,11 @@ case class Env(accessIp: String, servers: List[Server])
 case class Server(name: String, descr: String, ssh: Env.port, ip: String, user: String,
                   vhosts: List[VHost]) extends Host
 
-case class VHost(name: String, descr: String, version: Option[String],
+case class VHost(name: String, descr: String,
                  tomcat: Env.port,
                  wso2: Option[Env.port], wsdl: Option[Env.port],
                  psql: Env.port, ssh: Env.port,
-                 ip: String, ctx: String, user: String = "user") extends Host
+                 ip: String, ctx: String, user: String) extends Host
+
+case class ExtVHost(name: String, descr: String,
+                    var version: String, serverName: String)

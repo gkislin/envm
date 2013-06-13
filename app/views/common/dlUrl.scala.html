@@ -1,5 +1,7 @@
-@(label: String, protocol: String, port: Env.port, path: String, add: String = "")
+@(label: String, protocol: String, port: Env.port, path: String)
+
+@import models.Config
 
 @dl(label) {
-    @url(protocol, port, path)&nbsp;@add
+    @url(protocol, port, path)&nbsp;@Config.getFromConf(path+".passw", "(%s)","")
 }

@@ -2,39 +2,16 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.validation.Constraints._
 import models._
 import Env._
 
 import views._
 
 import models._
+import play.api.templates.Html
 
 object Application extends Controller {
-
-  /**
-   * Describes the hello form.
-   */
-  val vhostForm: Form[VHost] = Form(
-    mapping(
-      "name" -> nonEmptyText,
-      "descr" -> nonEmptyText,
-      "version" -> optional(text),
-      "tomcat" -> number(min = 1, max = Int.MaxValue),
-      "wso2" -> optional(number),
-      "wsdl" -> optional(number),
-      "psql" -> number(min = 1, max = Int.MaxValue),
-      "ssh" -> number(min = 1, max = Int.MaxValue),
-      "ip" -> text.verifying(
-        pattern( """\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b""".r, error = "Wrong IP")),
-      "ctx" -> nonEmptyText,
-      "user" -> nonEmptyText
-    )(VHost.apply)(VHost.unapply)
-  )
-
-  // -- Actions
+  private val ALL = "All"
 
   def index = Action {
     Ok(html.index("Environment Manager"))
@@ -42,7 +19,9 @@ object Application extends Controller {
 
   def serverDetail(serverName: String) = Action {
     Ok(
-      html.serverDetail(Env.server(serverName)))
+      if (serverName == ALL) Html("")
+      else html.serverDetail(Env.server(serverName))
+    )
   }
 
   def vhostDetail(serverName: String, name: String) = Action {
@@ -51,16 +30,23 @@ object Application extends Controller {
   }
 
   def servers = Action {
-    Ok(toJsonStr(Env.servers)).as(JSON)
+    Ok(Env.serversJson).as(JSON)
+  }
+
+  def setHostVersion(name: String, version: String) = Action {
+    Ok(Config.setVersion(name, version))
   }
 
   def vhosts(serverName: String) = Action {
-    Ok(toJsonStr(Env.vhosts(serverName))).as(JSON)
+    Ok(toJsonStr(
+      if (serverName == ALL) Env.extVHosts
+      else Env.serverHosts(serverName)
+    )).as(JSON)
   }
 
   def reload = Action {
     Env.reload()
-    Ok(toJsonStr(Env.servers)).as(JSON)
+    Ok(Env.serversJson).as(JSON)
   }
 
   def javascriptRoutes() = Action {
@@ -70,6 +56,7 @@ object Application extends Controller {
           // Routers
           routes.javascript.Application.serverDetail,
           routes.javascript.Application.vhostDetail,
+          routes.javascript.Application.servers,
           routes.javascript.Application.vhosts
         )
       ).as(JAVASCRIPT)

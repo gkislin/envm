@@ -21,16 +21,13 @@
             var serverName;
             $(document).ready(function() {
                 $(serverTable).jqGrid({
-                    url: "@routes.Application.servers",
-                    datatype: "json",
+                    datatype: "local",
                     height: 'auto',
                     colNames:['Name','Description'],
                     colModel:[
                         {name:'name',index:'name', width:100},
                         {name:'descr',index:'descr', width:280}
                     ],
-                    viewrecords: true,
-                    loadonce: true,
                     caption: "Servers",
                     onSelectRow: function(id){
                         if(id && id!==lastServerSel){
@@ -40,46 +37,58 @@
                            jsRoutes.controllers.Application.serverDetail(serverName).ajax({
                                 success: function(data) {
                                     $("#serverDetail").html(data);
-                                    lastVhostSel = -1;
-                                    $("#vhostDetail").empty()
-                                    jsRoutes.controllers.Application.vhosts(serverName).ajax({
-                                        success: function(gridData) {
-                                            reloadGrid("#vhostTable", gridData);
-                                            $("#vhosts").show()
-                                        },
-                                        error: showServerError
-                                    });
+                                    loadVHostGrid()
                                 },
                                 error: showServerError
                            });
                         }
                     }
                 });
-                $("#reloadBtn").click(function(){
+                $("#reloadServerBtn").click(function(){
                     $.get("@routes.Application.reload()", "",
-                        function (gridData){
-                            reloadGrid("#serverTable", gridData);
-                            $("#serverDetail").empty()
-                            $("#vhosts").hide()
-                            lastServerSel = -1;
-                        }
+                        reloadServerGrid
                     ).fail(showServerError);
                 });
+                jsRoutes.controllers.Application.servers().ajax({
+                    success: function(gridData) {
+                        reloadServerGrid(gridData);
+                    },
+                    error: showServerError
+                });
+                function reloadServerGrid(gridData){
+                    gridData.push({ name:"All", descr:"Все Окружения" });
+                    reloadGrid("#serverTable", gridData);
+                    $("#serverDetail").empty()
+                    $("#vhosts").hide()
+                    lastServerSel = -1;
+                }
+                function loadVHostGrid(){
+                    jsRoutes.controllers.Application.vhosts(serverName).ajax({
+                        success: function(gridData) {
+                            $("#vhostDetail").empty()
+                            lastVhostSel = -1;
+                            reloadGrid("#vhostTable", gridData);
+                            $("#vhosts").show()
+                    },
+                    error: showVhostError
+                });
+                }
                 $("#vhostTable").jqGrid({
                     datatype: "local",
                     height: 'auto',
-                    colNames:['Name','Description'],
+                    colNames:['Name','Description', 'AppVersion',''],
                     colModel:[
-                        {name:'name',index:'name', width:100},
-                        {name:'descr',index:'descr', width:280}
+                        {name:'name',index:'name', width:80},
+                        {name:'descr',index:'descr', width:280},
+                        {name:'version',index:'version', width:100},
+                        {name:'serverName',hidden: true}
                     ],
-                    viewrecords: true,
-                    loadonce: true,
                     caption: "Virtual Hosts",
                     onSelectRow: function(id){
                         if(id && id!==lastVhostSel){
                            $(this).restoreRow(lastVhostSel);
                            lastVhostSel=id;
+                           var serverName = $(this).getRowData(lastVhostSel)['serverName'];
                            var vhostName = $(this).getRowData(lastVhostSel)['name'];
                            jsRoutes.controllers.Application.vhostDetail(serverName, vhostName).ajax({
                                 success: function(data) {
@@ -90,8 +99,13 @@
                         }
                     }
                 });
-                $("#vhosts").hide()
-            });
+                $("#reloadVHostBtn").click(function(){
+                    $.get("@routes.Application.reload()", "",
+                        loadVHostGrid
+                    ).fail(showVhostError);
+                    });
+                    $("#vhosts").hide()
+                });
 
             function showServerError(errorData){
                 $("#vhosts").hide()
@@ -115,7 +129,7 @@
                     <td style="vertical-align: top">
                         <div>
                             <table id="serverTable"></table>
-                            <button id="reloadBtn">Reload</button>
+                            <button id="reloadServerBtn">Reload</button>
                         </div>
                     </td>
                     <td style="vertical-align: top">
@@ -130,6 +144,7 @@
                         <td style="vertical-align: top">
                             <div>
                                 <table id="vhostTable"></table>
+                                <button id="reloadVHostBtn">Reload</button>
                             </div>
                         </td>
                         <td style="vertical-align: top">

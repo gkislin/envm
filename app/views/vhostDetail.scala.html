@@ -4,10 +4,10 @@
 
 <div id="detailEnv" class="detail">
     @dlUrl(vhost.ctx.capitalize, "http", vhost.tomcat, vhost.ctx)
-    @dlUrl("Tomcat Manager", "http", vhost.tomcat, "manager", "(admin/passw)")
+    @dlUrl("Tomcat Manager", "http", vhost.tomcat, "manager")
     @if(vhost.name!="build") {
         @dlUrl("Logs", "http", vhost.tomcat, "logs")
-        @dlUrl("Bonita", "http", vhost.tomcat, "bonita", "(admin/bpm)")
+        @dlUrl("Bonita", "http", vhost.tomcat, "bonita")
         <dl>
             <dt><label>
                 <select id="config_app" style="width:90px">
@@ -22,7 +22,7 @@
         @vhost.wso2 match {
             case Some(wso2) => {
                 <hr>
-                @dlUrl("WSO2 manager", "https", wso2, "carbon", "(admin/admin)")
+                @dlUrl("WSO2 manager", "https", wso2, "carbon")
                 <dl>
                     <dt><label>
                         Wso2 DBS: <input type="text" id="dbsName" value="OrgUnit" size="13"/></label>
@@ -34,7 +34,7 @@
         }
     }
     <hr>
-    @dlUrl("PgSql", "jdbc:postgresql", vhost.psql, "rdb", "(user/passw)")
+    @dlUrl("PgSql", "jdbc:postgresql", vhost.psql, "rdb")
     <hr>
     @dl("SSH"){
         @Env.ssh(vhost)

@@ -16,7 +16,10 @@ GET     /server/:serverName           controllers.Application.serverDetail(serve
 GET     /vhosts/json/:serverName      controllers.Application.vhosts(serverName)
 
 # VHostDetail detail
-GET     /server/:serverName/:name      controllers.Application.vhostDetail(serverName, name)
+GET     /vhost/:serverName/:name      controllers.Application.vhostDetail(serverName, name)
+
+# Put version
+GET     /conf/:name      controllers.Application.setHostVersion(name, version)
 
 # Javascript routing
 GET    /assets/javascripts/routes     controllers.Application.javascriptRoutes()

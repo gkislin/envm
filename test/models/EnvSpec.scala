@@ -9,8 +9,8 @@ import org.specs2.mutable._
 class EnvSpec extends Specification {
   {
     "start with {" in {
-      Env.jsonValue must
-        startWith("{")
+      Env.serversJson must
+        startWith("[")
     }
   }
 }
