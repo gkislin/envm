@@ -70,7 +70,7 @@ object Config {
     case None => default
   }
 
-  def getVersion(name: String): String = props.getProperty(name + ".version", "undefined")
+  def getVersion(name: String): String = props.getProperty(name + ".version", "")
 
   def setVersion(name: String, version: String): String = {
     val host: ExtVHost = Env.extVHosts.find(_.name == name).get
