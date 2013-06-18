@@ -21,6 +21,9 @@ GET     /vhost/:serverName/:name      controllers.Application.vhostDetail(server
 # Put version
 GET     /conf/:name      controllers.Application.setHostVersion(name, version)
 
+# Browse DB
+GET     /browse/:name      controllers.Application.browseDB(name)
+
 # Javascript routing
 GET    /assets/javascripts/routes     controllers.Application.javascriptRoutes()
 

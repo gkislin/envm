@@ -43,6 +43,8 @@ object Env {
 
   def ssh(host: Host, ip: String = env.accessIp) = s"ssh -p ${host.ssh} ${host.user}@$ip"
 
+  def psql(host: VHost, ip: String = env.accessIp) = s"jdbc:postgresql://$ip:${host.psql}/rdb"
+
   def reload() {
     env = parse()
     serversJson = toJsonStr(env.servers)

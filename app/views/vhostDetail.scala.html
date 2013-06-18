@@ -34,7 +34,9 @@
         }
     }
     <hr>
-    @dlUrl("PgSql", "jdbc:postgresql", vhost.psql, "rdb")
+    @dl("PgSql") {
+        <a href='@routes.Application.browseDB(vhost.name)' target="_blank">@Env.psql(vhost)</a>&nbsp;@Config.getFromConf("psql.passw", "(%s)","")
+    }
     <hr>
     @dl("SSH"){
         @Env.ssh(vhost)

@@ -37,6 +37,10 @@ object Application extends Controller {
     Ok(Config.setVersion(name, version))
   }
 
+  def browseDB(name: String) = Action {
+    Ok(name)
+  }
+
   def vhosts(serverName: String) = Action {
     Ok(toJsonStr(
       if (serverName == ALL) Env.extVHosts
