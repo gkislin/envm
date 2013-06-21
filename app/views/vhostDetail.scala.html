@@ -4,6 +4,15 @@
 
 <div id="detailEnv" class="detail">
     @dlUrl(vhost.ctx.capitalize, "http", vhost.tomcat, vhost.ctx)
+    @if(vhost.name!="build") {
+        @defining(Config.getLoginPassw(vhost.ctx, Some(vhost))) { tuple =>
+            <form action='@Env.url("http", vhost.tomcat, s"${vhost.ctx}/j_acegi_security_check")' method='post' target="_blank">
+             <input name="j_username" value="@tuple._1"><br>
+             <input name="j_password" value="@tuple._2"><input type="submit" value="Login">
+            </form>
+        }
+    }
+    <hr>
     @dlUrl("Tomcat Manager", "http", vhost.tomcat, "manager")
     @if(vhost.name!="build") {
         @dlUrl("Logs", "http", vhost.tomcat, "logs")
@@ -35,7 +44,7 @@
     }
     <hr>
     @dl("PgSql") {
-        <a href='@routes.Application.browseDB(vhost.name)' target="_blank">@Env.psql(vhost)</a>&nbsp;@Config.getFromConf("psql.passw", "(%s)","")
+        <a href='@routes.Application.browseDB(vhost.name)' target="_blank">@Env.psql(vhost)</a>&nbsp;@Config.getFromConf("psql.passw", "(%s)","", Some(vhost))
     }
     <hr>
     @dl("SSH"){

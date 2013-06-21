@@ -37,8 +37,8 @@ object Application extends Controller {
     Ok(Config.setVersion(name, version))
   }
 
-  def browseDB(name: String) = Action {
-    Ok(name)
+  def browseDB(hostName: String) = Action {
+    Ok(html.browseDb(hostName))
   }
 
   def vhosts(serverName: String) = Action {
@@ -53,6 +53,17 @@ object Application extends Controller {
     Ok(Env.serversJson).as(JSON)
   }
 
+  def dbEntities(hostName: String, dbType: String) = Action {
+    Ok("[" +
+      "{\"name\":\"" + hostName + "1\", \"type\":\"" + dbType + "\",\"comment\":\"comment1\"}," +
+      "{\"name\":\"" + hostName + "2\", \"type\":\"" + dbType + "\",\"comment\":\"comment2\"}" +
+      "]").as(JSON)
+  }
+
+  def dbEntity(hostName: String, name: String) = Action {
+    Ok(s"<div class='detail'>$hostName:$name</div>")
+  }
+
   def javascriptRoutes() = Action {
     implicit request =>
       Ok(
@@ -61,19 +72,10 @@ object Application extends Controller {
           routes.javascript.Application.serverDetail,
           routes.javascript.Application.vhostDetail,
           routes.javascript.Application.servers,
-          routes.javascript.Application.vhosts
+          routes.javascript.Application.vhosts,
+          routes.javascript.Application.dbEntities,
+          routes.javascript.Application.dbEntity
         )
       ).as(JAVASCRIPT)
   }
-
-  /**
-   * Handles the form submission.
-  def sayHello = Action { implicit request =>
-    helloForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.index(formWithErrors)),
-      {case (name, repeat, color) => Ok(html.hello(name, repeat.toInt, color))}
-    )
-  }
-   */
-
 }

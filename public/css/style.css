@@ -98,3 +98,6 @@ hr {
     color: #A6C9E2;
     background: #A6C9E2;
 }
+td.info {
+    vertical-align: top
+}

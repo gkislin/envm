@@ -1,0 +1,91 @@
+@(hostName: String)
+
+<!DOCTYPE html>
+<html>
+    @head("DB "+hostName, "database_table")
+    <script>
+        var lastType='';
+        var lastEntity = -1;
+        $(document).ready(function() {
+            $("<option value='X' selected='selected'></option>").insertBefore($("select option")[0]);
+            $("#browseDb").hide();
+            $("#select_type").change(function() {
+                $("select option[value='X']").remove();
+                $("#browseDb").show();
+                if(this.value && this.value!==lastType){
+                    lastType = this.value;
+                    loadDbEntities();
+                }
+            });
+            $("#dbEntities").jqGrid({
+                datatype: "local",
+                height: 'auto',
+                colNames:['Name', 'Type', 'Comment'],
+                colModel:[
+                    {name:'name',index:'name', width:100},
+                    {name:'type',index:'type', width:60},
+                    {name:'comment',index:'comment', width:230}
+                ],
+                caption: "DB Entities",
+                onSelectRow: function(id){
+                    if(id && id!==lastEntity){
+                        $(this).restoreRow(lastEntity);
+                        lastEntity=id;
+                        var name = $(this).getRowData(lastEntity)['name'];
+                        jsRoutes.controllers.Application.dbEntity('@hostName', name).ajax({
+                            success: function(data) {
+                                $("#entityDetail").html(data);
+                            },
+                            error: showDbError
+                        });
+                    }
+                }
+            });
+            $("#reloadDb").click(function(){
+                loadDbEntities();
+            });
+        });
+        function loadDbEntities(){
+            jsRoutes.controllers.Application.dbEntities('@hostName', lastType).ajax({
+                success: function(gridData) {
+                    $("#entityDetail").empty();
+                    lastEntity = -1;
+                    reloadGrid("#dbEntities", gridData);
+                },
+                error: showDbError
+            });
+        }
+        function showDbError(errorData){
+            showError("#entityDetail", errorData);
+        }
+    </script>
+    <body>
+        <header>DB @hostName</header>
+        <section>
+            <div id="select" style="padding: 2px">
+                DB Type: <select id="select_type" style="width:90px">
+                <option value="table">Table</option>
+                <option value="function">Function</option>
+                <option value="service">Service</option>
+                <option value="schema">Schema</option>
+                <option value="all">All</option>
+            </select>
+            </div>
+            <div id="browseDb">
+                <table>
+                    <tr>
+                        <td class="info">
+                            <div>
+                                <table id="dbEntities"></table>
+                                <button id="reloadDb">Reload</button>
+                            </div>
+                        </td>
+                        <td class="info">
+                            <div id="entityDetail"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </body>
+</html>

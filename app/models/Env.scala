@@ -65,12 +65,27 @@ object Config {
 
   def envConfigName() = getFromConf("env.config", "env.json")
 
-  def getFromConf(name: String, default: String): String = getFromConf(name, "%s", default)
+  def getFromConf(name: String, default: String): String = getFromConf(name, "%s", default, None)
 
-  def getFromConf(name: String, pattern: => String, default: String): String = Play.current.configuration.getString(name) match {
-    case Some(value) => pattern.format(value)
-    case None => default
+  def getFromConf(name: String, pattern: String, default: String): String = getFromConf(name, pattern, default, None)
+
+  def getLoginPassw(name: String, host: Option[VHost]): (String, String) = {
+    val str = getFromConf(s"$name.passw", "%s", "/", host)
+    val array = str.split('/')
+    (if (array.length > 0) array(0) else "", if (array.length > 1) array(1) else "")
   }
+
+  def getFromConf(name: String, pattern: String, default: String, opHost: Option[VHost]): String = {
+    val list: List[String] = opHost match {
+      case Some(vhost) => List(s"${vhost.name}.$name", name)
+      case None => List(name)
+    }
+    list.find(!Play.current.configuration.getString(_).isEmpty) match {
+      case Some(key) => pattern.format(Play.current.configuration.getString(key).get)
+      case None => default
+    }
+  }
+
 
   def getVersion(name: String): String = props.getProperty(name + ".version", "")
 

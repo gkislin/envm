@@ -2,137 +2,120 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>@title</title>
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/compass.png")">
-        <link rel="stylesheet" href="@routes.Assets.at("css/style.css")">
-        <link rel="stylesheet" href="@routes.Assets.at("css/redmond/jquery-ui.css")">
-        <link rel="stylesheet" href="@routes.Assets.at("css/redmond/jquery.ui.theme.css")">
-        <link rel="stylesheet" href="@routes.Assets.at("css/jqgrid/ui.jqgrid.css")">
-
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js" type="text/javascript"></script>
-        <script src="http://www.trirand.com/blog/jqgrid/js/jquery.jqGrid.min.js" type="text/javascript"></script>
-        <script type="text/javascript" src="@routes.Application.javascriptRoutes"></script>
-
-        <script>
-            var lastServerSel = -1;
-            var lastVhostSel = -1;
-            var serverName;
-            $(document).ready(function() {
-                $(serverTable).jqGrid({
-                    datatype: "local",
-                    height: 'auto',
-                    colNames:['Name','Description'],
-                    colModel:[
-                        {name:'name',index:'name', width:100},
-                        {name:'descr',index:'descr', width:280}
-                    ],
-                    caption: "Servers",
-                    onSelectRow: function(id){
-                        if(id && id!==lastServerSel){
-                           $(this).restoreRow(lastServerSel);
-                           lastServerSel=id;
-                           serverName = $(this).getRowData(lastServerSel)['name'];
-                           jsRoutes.controllers.Application.serverDetail(serverName).ajax({
-                                success: function(data) {
-                                    $("#serverDetail").html(data);
-                                    loadVHostGrid()
-                                },
-                                error: showServerError
-                           });
-                        }
+    @head(title, "compass")
+    <script>
+        var lastServerSel = -1;
+        var lastVhostSel = -1;
+        var serverName;
+        $(document).ready(function() {
+            $(serverTable).jqGrid({
+                datatype: "local",
+                height: 'auto',
+                colNames:['Name','Description'],
+                colModel:[
+                    {name:'name',index:'name', width:100},
+                    {name:'descr',index:'descr', width:280}
+                ],
+                caption: "Servers",
+                onSelectRow: function(id){
+                    if(id && id!==lastServerSel){
+                       $(this).restoreRow(lastServerSel);
+                       lastServerSel=id;
+                       serverName = $(this).getRowData(lastServerSel)['name'];
+                       jsRoutes.controllers.Application.serverDetail(serverName).ajax({
+                            success: function(data) {
+                                $("#serverDetail").html(data);
+                                loadVHostGrid()
+                            },
+                            error: showServerError
+                       });
                     }
-                });
-                $("#reloadServerBtn").click(function(){
-                    $.get("@routes.Application.reload()", "",
-                        reloadServerGrid
-                    ).fail(showServerError);
-                });
-                jsRoutes.controllers.Application.servers().ajax({
-                    success: function(gridData) {
-                        reloadServerGrid(gridData);
-                    },
-                    error: showServerError
-                });
-                function reloadServerGrid(gridData){
-                    gridData.push({ name:"All", descr:"Все Окружения" });
-                    reloadGrid("#serverTable", gridData);
-                    $("#serverDetail").empty()
-                    $("#vhosts").hide()
-                    lastServerSel = -1;
                 }
-                function loadVHostGrid(){
-                    jsRoutes.controllers.Application.vhosts(serverName).ajax({
-                        success: function(gridData) {
-                            $("#vhostDetail").empty()
-                            lastVhostSel = -1;
-                            reloadGrid("#vhostTable", gridData);
-                            $("#vhosts").show()
+            });
+            $("#reloadServerBtn").click(function(){
+                $.get("@routes.Application.reload()", "",
+                    reloadServerGrid
+                ).fail(showServerError);
+            });
+            jsRoutes.controllers.Application.servers().ajax({
+                success: function(gridData) {
+                    reloadServerGrid(gridData);
+                },
+                error: showServerError
+            });
+            function reloadServerGrid(gridData){
+                gridData.push({ name:"All", descr:"Все Окружения" });
+                reloadGrid("#serverTable", gridData);
+                $("#serverDetail").empty();
+                $("#vhosts").hide();
+                lastServerSel = -1;
+            }
+            function loadVHostGrid(){
+                jsRoutes.controllers.Application.vhosts(serverName).ajax({
+                    success: function(gridData) {
+                        $("#vhostDetail").empty();
+                        lastVhostSel = -1;
+                        reloadGrid("#vhostTable", gridData);
+                        $("#vhosts").show()
                     },
                     error: showVhostError
                 });
-                }
-                $("#vhostTable").jqGrid({
-                    datatype: "local",
-                    height: 'auto',
-                    colNames:['Name','Description', 'AppVersion',''],
-                    colModel:[
-                        {name:'name',index:'name', width:80},
-                        {name:'descr',index:'descr', width:280},
-                        {name:'version',index:'version', width:100},
-                        {name:'serverName',hidden: true}
-                    ],
-                    caption: "Virtual Hosts",
-                    onSelectRow: function(id){
-                        if(id && id!==lastVhostSel){
-                           $(this).restoreRow(lastVhostSel);
-                           lastVhostSel=id;
-                           var serverName = $(this).getRowData(lastVhostSel)['serverName'];
-                           var vhostName = $(this).getRowData(lastVhostSel)['name'];
-                           jsRoutes.controllers.Application.vhostDetail(serverName, vhostName).ajax({
-                                success: function(data) {
-                                    $("#vhostDetail").html(data);
-                                },
-                                error: showVhostError
-                           });
-                        }
+            }
+            $("#vhostTable").jqGrid({
+                datatype: "local",
+                height: 'auto',
+                colNames:['Name','Description', 'AppVersion',''],
+                colModel:[
+                    {name:'name',index:'name', width:80},
+                    {name:'descr',index:'descr', width:280},
+                    {name:'version',index:'version', width:100},
+                    {name:'serverName',hidden: true}
+                ],
+                caption: "Virtual Hosts",
+                onSelectRow: function(id){
+                    if(id && id!==lastVhostSel){
+                       $(this).restoreRow(lastVhostSel);
+                       lastVhostSel=id;
+                       var serverName = $(this).getRowData(lastVhostSel)['serverName'];
+                       var vhostName = $(this).getRowData(lastVhostSel)['name'];
+                       jsRoutes.controllers.Application.vhostDetail(serverName, vhostName).ajax({
+                            success: function(data) {
+                                $("#vhostDetail").html(data);
+                            },
+                            error: showVhostError
+                       });
                     }
-                });
-                $("#reloadVHostBtn").click(function(){
-                    $.get("@routes.Application.reload()", "",
-                        loadVHostGrid
-                    ).fail(showVhostError);
-                    });
-                    $("#vhosts").hide()
-                });
+                }
+            });
+            $("#reloadVHostBtn").click(function(){
+                $.get("@routes.Application.reload()", "",
+                    loadVHostGrid
+                ).fail(showVhostError);
+            });
+            $("#vhosts").hide()
+        });
 
-            function showServerError(errorData){
-                $("#vhosts").hide()
-                $("#serverDetail").html(errorData.responseText);
-            }
-            function showVhostError(errorData){
-                $("#vhostDetail").html(errorData.responseText);
-            }
-            function reloadGrid(gridId, gridData){
-              $(gridId).jqGrid('clearGridData');
-              $(gridId).jqGrid('setGridParam', {data: gridData}).trigger('reloadGrid');
-            }
-        </script>
-    </head>
+        function showServerError(errorData){
+            $("#vhosts").hide();
+            showError("#serverDetail", errorData);
+        }
+        function showVhostError(errorData){
+            showError("#vhostDetail", errorData);
+        }
+    </script>
     <body>
         <header>@title</header>
         <section>
             <div id="servers">
             <table>
                 <tr>
-                    <td style="vertical-align: top">
+                    <td class="info">
                         <div>
                             <table id="serverTable"></table>
                             <button id="reloadServerBtn">Reload</button>
                         </div>
                     </td>
-                    <td style="vertical-align: top">
+                    <td class="info">
                         <div id="serverDetail"></div>
                     </td>
                 </tr>
@@ -141,13 +124,13 @@
             <div id="vhosts">
                 <table>
                     <tr>
-                        <td style="vertical-align: top">
+                        <td class="info">
                             <div>
                                 <table id="vhostTable"></table>
                                 <button id="reloadVHostBtn">Reload</button>
                             </div>
                         </td>
-                        <td style="vertical-align: top">
+                        <td class="info">
                             <div id="vhostDetail"></div>
                         </td>
                     </tr>
