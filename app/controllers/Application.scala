@@ -53,15 +53,15 @@ object Application extends Controller {
     Ok(Env.serversJson).as(JSON)
   }
 
-  def dbEntities(hostName: String, dbType: String) = Action {
+  def dbEntities(hostName: String, dbType: String, name:String) = Action {
     Ok("[" +
-      "{\"name\":\"" + hostName + "1\", \"type\":\"" + dbType + "\",\"comment\":\"comment1\"}," +
-      "{\"name\":\"" + hostName + "2\", \"type\":\"" + dbType + "\",\"comment\":\"comment2\"}" +
+      "{\"name\":\"" + hostName + "1\", \"type\":\"" + dbType + "\",\"comment\":\""+name+"1\"}," +
+      "{\"name\":\"" + hostName + "2\", \"type\":\"" + dbType + "\",\"comment\":\""+name+"2\"}" +
       "]").as(JSON)
   }
 
-  def dbEntity(hostName: String, name: String) = Action {
-    Ok(s"<div class='detail'>$hostName:$name</div>")
+  def dbEntity(hostName: String, dbType: String, name:String) = Action {
+    Ok(s"<div class='detail'>$hostName:$dbType:$name</div>").as(HTML)
   }
 
   def javascriptRoutes() = Action {

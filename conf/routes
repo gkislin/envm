@@ -1,36 +1,35 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET     /                                    controllers.Application.index
+GET     /                                     controllers.Application.index
 
 # Reload
-GET     /reload                              controllers.Application.reload
+GET     /reload                               controllers.Application.reload
 
 # VHosts list
-GET     /servers/json                        controllers.Application.servers
+GET     /servers/json                         controllers.Application.servers
 
 # Server detail
-GET     /server/:serverName                  controllers.Application.serverDetail(serverName)
+GET     /server/:serverName                   controllers.Application.serverDetail(serverName)
 
 # VHosts list
-GET     /vhosts/json/:serverName             controllers.Application.vhosts(serverName)
+GET     /vhosts/json/:serverName              controllers.Application.vhosts(serverName)
 
 # VHostDetail detail
-GET     /vhost/:serverName/:name             controllers.Application.vhostDetail(serverName, name)
+GET     /vhost/:serverName/:name              controllers.Application.vhostDetail(serverName, name)
 
 # Put version
-GET     /conf/:name                          controllers.Application.setHostVersion(name, version)
+GET     /conf/:name                           controllers.Application.setHostVersion(name, version)
 
 # Browse DB
 GET     /db/:hostName                         controllers.Application.browseDB(hostName)
 
-GET     /db/:hostName/dbEntities/:dbType      controllers.Application.dbEntities(hostName, dbType)
+GET     /db/:hostName/list/:dbType/:name      controllers.Application.dbEntities(hostName, dbType, name)
 
-GET     /db/:hostName/dbEntity/:name          controllers.Application.dbEntity(hostName, name)
-
+GET     /db/:hostName/:dbType/:name           controllers.Application.dbEntity(hostName, dbType, name)
 
 # Javascript routing
-GET     /assets/javascripts/routes           controllers.Application.javascriptRoutes()
+GET     /assets/javascripts/routes            controllers.Application.javascriptRoutes()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                        controllers.Assets.at(path="/public", file)
+GET     /assets/*file                         controllers.Assets.at(path="/public", file)

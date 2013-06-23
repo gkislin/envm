@@ -71,8 +71,12 @@ object Config {
 
   def getLoginPassw(name: String, host: Option[VHost]): (String, String) = {
     val str = getFromConf(s"$name.passw", "%s", "/", host)
-    val array = str.split('/')
-    (if (array.length > 0) array(0) else "", if (array.length > 1) array(1) else "")
+    str.split('/') match {
+      case Array() => ("", "")
+      case Array(val1) => (val1, "")
+      case Array(val1, val2) => (val1, val2)
+    }
+    //    (if (array.length > 0) array(0) else "", if (array.length > 1) array(1) else "")
   }
 
   def getFromConf(name: String, pattern: String, default: String, opHost: Option[VHost]): String = {

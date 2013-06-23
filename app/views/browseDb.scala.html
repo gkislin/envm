@@ -4,19 +4,10 @@
 <html>
     @head("DB "+hostName, "database_table")
     <script>
-        var lastType='';
         var lastEntity = -1;
         $(document).ready(function() {
-            $("<option value='X' selected='selected'></option>").insertBefore($("select option")[0]);
             $("#browseDb").hide();
-            $("#select_type").change(function() {
-                $("select option[value='X']").remove();
-                $("#browseDb").show();
-                if(this.value && this.value!==lastType){
-                    lastType = this.value;
-                    loadDbEntities();
-                }
-            });
+            $("#show").click(loadDbEntities);
             $("#dbEntities").jqGrid({
                 datatype: "local",
                 height: 'auto',
@@ -41,19 +32,35 @@
                     }
                 }
             });
-            $("#reloadDb").click(function(){
-                loadDbEntities();
+            $("#entity_name").keypress(function(e) {
+                if (e.which == 13) {
+                    loadDbEntities();
+                }
             });
         });
         function loadDbEntities(){
-            jsRoutes.controllers.Application.dbEntities('@hostName', lastType).ajax({
-                success: function(gridData) {
-                    $("#entityDetail").empty();
-                    lastEntity = -1;
-                    reloadGrid("#dbEntities", gridData);
+            $("#browseDb").show();
+            var type = $("#select_type").val();
+            var name = $("#entity_name").val();
+            if(type!='all' && name.indexOf("*")==-1){
+                jsRoutes.controllers.Application.dbEntity('@hostName', type, name).ajax({
+                success: function(data) {
+                    $("#tdEntities").hide();
+                    $("#entityDetail").html(data);
                 },
                 error: showDbError
-            });
+                });
+            } else {
+                jsRoutes.controllers.Application.dbEntities('@hostName', type, name).ajax({
+                    success: function(gridData) {
+                        lastEntity = -1;
+                        $("#entityDetail").empty();
+                        $("#tdEntities").show();
+                        reloadGrid("#dbEntities", gridData);
+                    },
+                    error: showDbError
+                });
+            }
         }
         function showDbError(errorData){
             showError("#entityDetail", errorData);
@@ -61,23 +68,26 @@
     </script>
     <body>
         <header>DB @hostName</header>
+
         <section>
             <div id="select" style="padding: 2px">
-                DB Type: <select id="select_type" style="width:90px">
-                <option value="table">Table</option>
-                <option value="function">Function</option>
-                <option value="service">Service</option>
-                <option value="schema">Schema</option>
-                <option value="all">All</option>
-            </select>
+                    Type: &nbsp;&nbsp;<select id="select_type" style="width:130px">
+                        <option value="table">Table</option>
+                        <option value="function">Function</option>
+                        <option value="service">Service</option>
+                        <option value="schema">Schema</option>
+                        <option value="all">All</option>
+                    </select><br>
+                    Name: <input type="text" id="entity_name" value="ecm.card_*" style="width:150px">
+                    <button id="show">Show</button>
             </div>
             <div id="browseDb">
                 <table>
                     <tr>
-                        <td class="info">
+                        <td class="info" id="tdEntities">
                             <div>
                                 <table id="dbEntities"></table>
-                                <button id="reloadDb">Reload</button>
+                                @*<button id="reloadDb">Reload</button>*@
                             </div>
                         </td>
                         <td class="info">
