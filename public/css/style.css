@@ -13,6 +13,7 @@ header {
 
 section {
     margin: 8px 0;
+    overflow:visible;
 }
 
 button, #submit {
@@ -100,4 +101,7 @@ hr {
 }
 td.info {
     vertical-align: top
+}
+.ui-jqgrid .ui-jqgrid-bdiv {
+    overflow-x: hidden !important;
 }

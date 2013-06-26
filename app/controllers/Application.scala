@@ -1,14 +1,14 @@
 package controllers
 
+import _root_.db.Browser
 import play.api._
 import play.api.mvc._
-import models._
-import Env._
-
+import models.Env.extVhostFormat
 import views._
 
 import models._
 import play.api.templates.Html
+import util.{JsonUtil, Config}
 
 object Application extends Controller {
   private val ALL = "All"
@@ -42,7 +42,7 @@ object Application extends Controller {
   }
 
   def vhosts(serverName: String) = Action {
-    Ok(toJsonStr(
+    Ok(JsonUtil.toJsonStr(
       if (serverName == ALL) Env.extVHosts
       else Env.serverHosts(serverName)
     )).as(JSON)
@@ -53,14 +53,15 @@ object Application extends Controller {
     Ok(Env.serversJson).as(JSON)
   }
 
-  def dbEntities(hostName: String, dbType: String, name:String) = Action {
-    Ok("[" +
-      "{\"name\":\"" + hostName + "1\", \"type\":\"" + dbType + "\",\"comment\":\""+name+"1\"}," +
-      "{\"name\":\"" + hostName + "2\", \"type\":\"" + dbType + "\",\"comment\":\""+name+"2\"}" +
-      "]").as(JSON)
+  def dbEntities(hostName: String, dbType: String, mask: String) = Action {
+    Ok(Browser.entityList(Env.vhost(hostName), dbType, mask)).as(JSON)
   }
 
-  def dbEntity(hostName: String, dbType: String, name:String) = Action {
+  def dbTypes(hostName: String, dbType: String) = Action {
+    Ok(Browser.entityList(Env.vhost(hostName), dbType, "")).as(JSON)
+  }
+
+  def dbEntity(hostName: String, dbType: String, name: String) = Action {
     Ok(s"<div class='detail'>$hostName:$dbType:$name</div>").as(HTML)
   }
 
@@ -74,7 +75,8 @@ object Application extends Controller {
           routes.javascript.Application.servers,
           routes.javascript.Application.vhosts,
           routes.javascript.Application.dbEntities,
-          routes.javascript.Application.dbEntity
+          routes.javascript.Application.dbEntity,
+          routes.javascript.Application.dbTypes
         )
       ).as(JAVASCRIPT)
   }

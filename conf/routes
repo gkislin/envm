@@ -24,7 +24,9 @@ GET     /conf/:name                           controllers.Application.setHostVer
 # Browse DB
 GET     /db/:hostName                         controllers.Application.browseDB(hostName)
 
-GET     /db/:hostName/list/:dbType/:name      controllers.Application.dbEntities(hostName, dbType, name)
+GET     /db/:hostName/:dbType                 controllers.Application.dbTypes(hostName, dbType)
+
+GET     /db/:hostName/list/:dbType/:mask      controllers.Application.dbEntities(hostName, dbType, mask)
 
 GET     /db/:hostName/:dbType/:name           controllers.Application.dbEntity(hostName, dbType, name)
 

@@ -9,13 +9,14 @@
             $("#browseDb").hide();
             $("#show").click(loadDbEntities);
             $("#dbEntities").jqGrid({
-                datatype: "local",
-                height: 'auto',
+                datatype: 'local',
+                rowNum:-1,
+                scrollOffset: 0,
                 colNames:['Name', 'Type', 'Comment'],
                 colModel:[
-                    {name:'name',index:'name', width:100},
-                    {name:'type',index:'type', width:60},
-                    {name:'comment',index:'comment', width:230}
+                    {name:'name',index:'name', width:230},
+                    {name:'dbtype',index:'dbtype', width:60},
+                    {name:'comment',index:'comment', width:300}
                 ],
                 caption: "DB Entities",
                 onSelectRow: function(id){
@@ -41,8 +42,13 @@
         function loadDbEntities(){
             $("#browseDb").show();
             var type = $("#select_type").val();
-            var name = $("#entity_name").val();
-            if(type!='all' && name.indexOf("*")==-1){
+            var name = $("#entity_name").val().trim();
+            if(name.length==0){
+                jsRoutes.controllers.Application.dbTypes('@hostName', type).ajax({
+                    success: reloadDbEntities,
+                    error: showDbError
+                });
+            } else if(type!='all' && name.indexOf("*")==-1){
                 jsRoutes.controllers.Application.dbEntity('@hostName', type, name).ajax({
                 success: function(data) {
                     $("#tdEntities").hide();
@@ -51,16 +57,20 @@
                 error: showDbError
                 });
             } else {
-                jsRoutes.controllers.Application.dbEntities('@hostName', type, name).ajax({
-                    success: function(gridData) {
-                        lastEntity = -1;
-                        $("#entityDetail").empty();
-                        $("#tdEntities").show();
-                        reloadGrid("#dbEntities", gridData);
-                    },
+                jsRoutes.controllers.Application.dbEntities('@hostName', type, name.replace(/\*/g, '%')).ajax({
+                    success: reloadDbEntities,
                     error: showDbError
                 });
             }
+        }
+        function reloadDbEntities(gridData){
+            lastEntity = -1;
+            $("#entityDetail").empty();
+            $(".ui-jqgrid-bdiv").height(
+                $(window).height() - $('header').height() - $('#select').height()-110
+            );
+            reloadGrid("#dbEntities", gridData);
+            $("#tdEntities").show();
         }
         function showDbError(errorData){
             showError("#entityDetail", errorData);
@@ -78,7 +88,7 @@
                         <option value="schema">Schema</option>
                         <option value="all">All</option>
                     </select><br>
-                    Name: <input type="text" id="entity_name" value="ecm.card_*" style="width:150px">
+                    Mask: <input type="text" id="entity_name" value="ecm.card_*" style="width:150px">
                     <button id="show">Show</button>
             </div>
             <div id="browseDb">
