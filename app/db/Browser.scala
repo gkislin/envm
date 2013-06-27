@@ -10,9 +10,8 @@ import util.JsonUtil
  * Date: 26.06.13
  */
 
-case class Entity(name: String, comment: String, dbtype: String) {
-
-}
+case class Entity(name: String, comment: Option[String], dbtype: String)
+//case class Entity(name: String, comment: String, dbtype: String)
 
 object Browser {
   implicit val entityFormat: Writes[Entity] = Json.writes[Entity]
@@ -22,7 +21,7 @@ object Browser {
       implicit c =>
         SQL("SELECT * FROM type_list({dbType}, {mask}) AS (name TEXT, comment TEXT, dbtype TEXT)")
           .on("dbType" -> dbType, "mask" -> mask)().map {
-          case Row(name: String, comment: String, dbtype: String) => Entity(name, comment, dbtype)
+            row  => Entity(row[String]("name"), row[Option[String]]("comment"), row[String]("dbtype"))
         }
     })
 }
