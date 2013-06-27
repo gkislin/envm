@@ -6,7 +6,7 @@
     <script>
         var lastServerSel = -1;
         var lastVhostSel = -1;
-        var serverName;
+        var serverName = 'All';
         $(document).ready(function() {
             $(serverTable).jqGrid({
                 datatype: "local",
@@ -22,13 +22,7 @@
                        $(this).restoreRow(lastServerSel);
                        lastServerSel=id;
                        serverName = $(this).getRowData(lastServerSel)['name'];
-                       jsRoutes.controllers.Application.serverDetail(serverName).ajax({
-                            success: function(data) {
-                                $("#serverDetail").html(data);
-                                loadVHostGrid()
-                            },
-                            error: showServerError
-                       });
+                       loadServerDetail(serverName);
                     }
                 }
             });
@@ -43,24 +37,6 @@
                 },
                 error: showServerError
             });
-            function reloadServerGrid(gridData){
-                gridData.push({ name:"All", descr:"Все Окружения" });
-                reloadGrid("#serverTable", gridData);
-                $("#serverDetail").empty();
-                $("#vhosts").hide();
-                lastServerSel = -1;
-            }
-            function loadVHostGrid(){
-                jsRoutes.controllers.Application.vhosts(serverName).ajax({
-                    success: function(gridData) {
-                        $("#vhostDetail").empty();
-                        lastVhostSel = -1;
-                        reloadGrid("#vhostTable", gridData);
-                        $("#vhosts").show()
-                    },
-                    error: showVhostError
-                });
-            }
             $("#vhostTable").jqGrid({
                 datatype: "local",
                 height: 'auto',
@@ -92,9 +68,36 @@
                     loadVHostGrid
                 ).fail(showVhostError);
             });
-            $("#vhosts").hide()
+            loadVHostGrid();
         });
 
+        function reloadServerGrid(gridData){
+            gridData.push({ name:"All", descr:"Все Окружения" });
+            reloadGrid("#serverTable", gridData);
+            $("#serverDetail").empty();
+            $("#vhosts").hide();
+            lastServerSel = -1;
+        }
+        function loadVHostGrid(){
+            jsRoutes.controllers.Application.vhosts(serverName).ajax({
+            success: function(gridData) {
+                $("#vhostDetail").empty();
+                lastVhostSel = -1;
+                reloadGrid("#vhostTable", gridData);
+                $("#vhosts").show()
+            },
+            error: showVhostError
+            });
+        }
+        function loadServerDetail(serverName){
+            jsRoutes.controllers.Application.serverDetail(serverName).ajax({
+                success: function(data) {
+                    $("#serverDetail").html(data);
+                    loadVHostGrid()
+                },
+                error: showServerError
+            });
+        }
         function showServerError(errorData){
             $("#vhosts").hide();
             showError("#serverDetail", errorData);

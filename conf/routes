@@ -7,13 +7,13 @@ GET     /                                     controllers.Application.index
 GET     /reload                               controllers.Application.reload
 
 # VHosts list
-GET     /servers/json                         controllers.Application.servers
+GET     /servers                              controllers.Application.servers
 
 # Server detail
 GET     /server/:serverName                   controllers.Application.serverDetail(serverName)
 
 # VHosts list
-GET     /vhosts/json/:serverName              controllers.Application.vhosts(serverName)
+GET     /vhosts/:serverName                   controllers.Application.vhosts(serverName)
 
 # VHostDetail detail
 GET     /vhost/:serverName/:name              controllers.Application.vhostDetail(serverName, name)
