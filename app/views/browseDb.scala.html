@@ -43,11 +43,13 @@
                     success: reloadDbEntities,
                     error: showDbError
                 });
-            } else if(name.indexOf("*")==-1){
-                $("#tdEntities").hide();
-                showEntity(name, dbtype);
             } else {
-                jsRoutes.controllers.Application.dbEntities('@hostName', dbtype, name.replace(/\*/g, '%')).ajax({
+                if(name.indexOf("*")==-1){
+                    name = name + "%";
+                } else {
+                    name = name.replace(/\*/g, '%');
+                }
+                jsRoutes.controllers.Application.dbEntities('@hostName', dbtype, name).ajax({
                     success: reloadDbEntities,
                     error: showDbError
                 });
