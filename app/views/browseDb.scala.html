@@ -25,12 +25,7 @@
                         lastEntity=id;
                         var dbtype = $(this).getRowData(lastEntity)['dbtype'];
                         var name = $(this).getRowData(lastEntity)['name'];
-                        jsRoutes.controllers.Application.dbEntity('@hostName', dbtype, name).ajax({
-                            success: function(data) {
-                                $("#entityDetail").html(data);
-                            },
-                            error: showDbError
-                        });
+                        showEntity(name, dbtype);
                     }
                 }
             });
@@ -41,35 +36,38 @@
             });
         });
         function loadDbEntities(){
-            var type = $("#select_type").val();
+            var dbtype = $("#select_type").val();
             var name = $("#entity_name").val().trim();
             if(name.length==0){
-                jsRoutes.controllers.Application.dbTypes('@hostName', type).ajax({
+                jsRoutes.controllers.Application.dbTypes('@hostName', dbtype).ajax({
                     success: reloadDbEntities,
                     error: showDbError
                 });
-            } else if(type!='all' && name.indexOf("*")==-1){
-                $("#entityDetail").html(data);
-                jsRoutes.controllers.Application.dbEntity('@hostName', type, name).ajax({
-                success: function(data) {
-                    $("#tdEntities").hide();
-                    $("#browseDb").show();
-                    $("#entityDetail").html(data);
-                },
-                error: showDbError
-                });
+            } else if(dbtype!='all' && name.indexOf("*")==-1){
+                $("#tdEntities").hide();
+                showEntity(name, dbtype);
             } else {
-                jsRoutes.controllers.Application.dbEntities('@hostName', type, name.replace(/\*/g, '%')).ajax({
+                jsRoutes.controllers.Application.dbEntities('@hostName', dbtype, name.replace(/\*/g, '%')).ajax({
                     success: reloadDbEntities,
                     error: showDbError
                 });
             }
         }
+        function showEntity(name, dbtype){
+            $("#browseDb").show();
+            $("#entityDetail").html("<div class=loading>Loading ...</div>");
+            jsRoutes.controllers.Application.dbEntity('@hostName', dbtype, name).ajax({
+                success: function(data) {
+                    $("#entityDetail").html(data);
+                },
+                error: showDbError
+            });
+        }
         function reloadDbEntities(gridData){
             lastEntity = -1;
             $("#entityDetail").empty();
             $(".ui-jqgrid-bdiv").height(
-                $(window).height() - $('header').height() - $('#select').height()-110
+                $(window).height() - $('header').height() - $('#select').height()-100
             );
             gridData.push({}); // workaround jqGrid doesn't show last line
             reloadGrid("#dbEntities", gridData);
@@ -105,7 +103,7 @@
                             </div>
                         </td>
                         <td class="info">
-                            <div id="entityDetail" class="fill"></div>
+                            <div id="entityDetail"></div>
                         </td>
                     </tr>
                 </table>
