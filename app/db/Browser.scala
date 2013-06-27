@@ -30,7 +30,7 @@ object Browser {
   def entityDescr(vhost: VHost, dbType: String, name: String): String =
     Db.withConnection(vhost) {
       implicit c =>
-        SQL("SELECT * FROM entity_html({dbType}, {name})")
-          .on("dbType" -> dbType, "name" -> name).as(scalar[String].single)
+        SQL("SELECT * FROM entity_html({vhostName}, {dbType}, {name})")
+          .on("vhostName" -> vhost.name, "dbType" -> dbType, "name" -> name).as(scalar[String].single)
     }
 }
