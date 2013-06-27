@@ -43,7 +43,7 @@
                     success: reloadDbEntities,
                     error: showDbError
                 });
-            } else if(dbtype!='all' && name.indexOf("*")==-1){
+            } else if(name.indexOf("*")==-1){
                 $("#tdEntities").hide();
                 showEntity(name, dbtype);
             } else {
@@ -55,13 +55,17 @@
         }
         function showEntity(name, dbtype){
             $("#browseDb").show();
-            $("#entityDetail").html("<div class=loading>Loading ...</div>");
-            jsRoutes.controllers.Application.dbEntity('@hostName', dbtype, name).ajax({
-                success: function(data) {
-                    $("#entityDetail").html(data);
-                },
-                error: showDbError
-            });
+            if(dbtype=='all' || dbtype=="schema"){
+                $("#entityDetail").html("<div class=loading>NOT SUPPORTED</div>");
+            } else {
+                $("#entityDetail").html("<div class=loading>Loading ...</div>");
+                jsRoutes.controllers.Application.dbEntity('@hostName', dbtype, name).ajax({
+                    success: function(data) {
+                        $("#entityDetail").html(data);
+                    },
+                    error: showDbError
+                });
+            }
         }
         function reloadDbEntities(gridData){
             lastEntity = -1;
