@@ -62,7 +62,7 @@ object Application extends Controller {
   }
 
   def dbEntity(hostName: String, dbType: String, name: String) = Action {
-    Ok(s"<div class='detail'>$hostName:$dbType:$name</div>").as(HTML)
+    Ok(Browser.entityDescr(Env.vhost(hostName), dbType, name)).as(HTML)
   }
 
   def javascriptRoutes() = Action {

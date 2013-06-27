@@ -4,6 +4,7 @@ import models.VHost
 import anorm._
 import play.api.libs.json.{Json, Writes}
 import util.JsonUtil
+import anorm.SqlParser.scalar
 
 /**
  * User: gkislin
@@ -11,6 +12,7 @@ import util.JsonUtil
  */
 
 case class Entity(name: String, comment: Option[String], dbtype: String)
+
 //case class Entity(name: String, comment: String, dbtype: String)
 
 object Browser {
@@ -21,7 +23,14 @@ object Browser {
       implicit c =>
         SQL("SELECT * FROM type_list({dbType}, {mask}) AS (name TEXT, comment TEXT, dbtype TEXT)")
           .on("dbType" -> dbType, "mask" -> mask)().map {
-            row  => Entity(row[String]("name"), row[Option[String]]("comment"), row[String]("dbtype"))
+          row => Entity(row[String]("name"), row[Option[String]]("comment"), row[String]("dbtype"))
         }
     })
+
+  def entityDescr(vhost: VHost, dbType: String, name: String): String =
+    Db.withConnection(vhost) {
+      implicit c =>
+        SQL("SELECT * FROM entity_html({dbType}, {name})")
+          .on("dbType" -> dbType, "name" -> name).as(scalar[String].single)
+    }
 }
