@@ -57,17 +57,13 @@
         }
         function showEntity(name, dbtype){
             $("#browseDb").show();
-            if(dbtype=='all' || dbtype=="schema"){
-                $("#entityDetail").html("<div class=loading>NOT SUPPORTED</div>");
-            } else {
-                $("#entityDetail").html("<div class=loading>Loading ...</div>");
-                jsRoutes.controllers.Application.dbEntity('@hostName', dbtype, name).ajax({
-                    success: function(data) {
-                        $("#entityDetail").html(data);
-                    },
-                    error: showDbError
-                });
-            }
+            $("#entityDetail").html("<div class=loading>Loading ...</div>");
+            jsRoutes.controllers.Application.dbEntity('@hostName', dbtype, name).ajax({
+                success: function(data) {
+                    $("#entityDetail").html(data);
+                },
+                error: showDbError
+            });
         }
         function reloadDbEntities(gridData){
             lastEntity = -1;
