@@ -5,43 +5,39 @@
 
 <div id="detailEnv" class="detail">
     @dlUrl(vhost.ctx.capitalize, "http", vhost.tomcat, vhost.ctx)
-    @if(vhost.name!="build") {
-        @defining(Config.getLoginPassw(vhost.ctx, Some(vhost))) { tuple =>
-            <form action='@Env.url("http", vhost.tomcat, s"${vhost.ctx}/j_acegi_security_check")' method='post' target="_blank">
-             <input name="j_username" value="@tuple._1"><br>
-             <input name="j_password" value="@tuple._2"><input type="submit" value="Login">
-            </form>
-        }
+    @defining(Config.getLoginPassw(vhost.ctx, Some(vhost))) { tuple =>
+        <form action='@Env.url("http", vhost.tomcat, s"${vhost.ctx}/j_acegi_security_check")' method='post' target="_blank">
+         <input name="j_username" value="@tuple._1"><br>
+         <input name="j_password" value="@tuple._2"><input type="submit" value="Login">
+        </form>
     }
     <hr>
     @dlUrl("Tomcat Manager", "http", vhost.tomcat, "manager")
-    @if(vhost.name!="build") {
-        @dlUrl("Logs", "http", vhost.tomcat, "logs")
-        @dlUrl("Bonita", "http", vhost.tomcat, "bonita")
-        <dl>
-            <dt><label>
-                <select id="config_app" style="width:90px">
-                    <option value="template">Template</option>
-                    <option value="mail">Mail</option>
-                    <option value="attach">Attach</option>
-                </select>&nbsp;&nbsp;config</label>
-            </dt>
-            <dd id="config"></dd>
-        </dl>
+    @dlUrl("Logs", "http", vhost.tomcat, "logs")
+    @dlUrl("Bonita", "http", vhost.tomcat, "bonita")
+    <dl>
+        <dt><label>
+            <select id="config_app" style="width:90px">
+                <option value="template">Template</option>
+                <option value="mail">Mail</option>
+                <option value="attach">Attach</option>
+            </select>&nbsp;&nbsp;config</label>
+        </dt>
+        <dd id="config"></dd>
+    </dl>
 
-        @vhost.wso2 match {
-            case Some(wso2) => {
-                <hr>
-                @dlUrl("WSO2 manager", "https", wso2, "carbon")
-                <dl>
-                    <dt><label>
-                        Wso2 DBS: <input type="text" id="dbsName" value="OrgUnit" size="13"/></label>
-                    </dt>
-                    <dd id="wsdl"></dd>
-                </dl>
-            }
-            case None => { }
+    @vhost.wso2 match {
+        case Some(wso2) => {
+            <hr>
+            @dlUrl("WSO2 manager", "https", wso2, "carbon")
+            <dl>
+                <dt><label>
+                    Wso2 DBS: <input type="text" id="dbsName" value="OrgUnit" size="13"/></label>
+                </dt>
+                <dd id="wsdl"></dd>
+            </dl>
         }
+        case None => { }
     }
     <hr>
     @dl("PgSql") {

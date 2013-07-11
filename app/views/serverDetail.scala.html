@@ -6,4 +6,9 @@
     @dl("SSH") {
         @Env.ssh(server, server.ip)
     }
+    @if(server.name=="river") {
+        <hr>
+        @dlUrl("Jenkins", "http", 8080, "jenkins")
+        @dlUrl("Tomcat Manager", "http", 8080, "manager")
+    }
 </div>
