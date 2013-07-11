@@ -46,12 +46,18 @@ object Config {
       case Some(vhost) => List(s"${vhost.name}.$name", name)
       case None => List(name)
     }
-    list.find(!Play.current.configuration.getString(_).isEmpty) match {
-      case Some(key) => pattern.format(Play.current.configuration.getString(key).get)
+    list.find(!get(_).isEmpty) match {
+      case Some(key) => pattern.format(get(key).get)
       case None => default
     }
   }
 
+  def get(key: String) = Play.current.configuration.getString(key)
+
+  def get(key: String, default: String) = Play.current.configuration.getString(key) match {
+    case Some(value) => value
+    case None => default
+  }
 
   def getVersion(name: String): String = props.getProperty(name + ".version", "")
 
@@ -70,7 +76,6 @@ object Config {
     }
   }
 }
-
 
 
 object JsonUtil {
