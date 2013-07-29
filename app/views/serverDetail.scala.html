@@ -1,14 +1,21 @@
 @(server: Server)
 
 @import common._
+@import models.Env.env
 
 <div class="detail">
-    @dl("SSH") {
-        @Env.ssh(server, server.ip)
-    }
-    @if(server.name=="river") {
+    @if(server.vpnIp != None) {
+        @dl("VPN SSH") {
+            @Env.vpnSsh(server)
+        }
         <hr>
-        @dlUrl("Jenkins", "http", 8080, "jenkins")
-        @dlUrl("Tomcat Manager", "http", 8080, "manager")
+    }
+    @dl("SSH") {
+        @Env.ssh(server)
+    }
+    @if(server.name == "river") {
+        <hr>
+        @dlUrl("Jenkins", "http", env.accessIp, 8080, "jenkins")
+        @dlUrl("Tomcat Manager", "http", env.accessIp, 8080, "manager")
     }
 </div>

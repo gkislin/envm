@@ -1,7 +1,7 @@
-@(label: String, protocol: String, port: Env.port, path: String)
+@(label: String, protocol: String, ip:String, port: Env.port, path: String)
 
 @import util.Config
 
 @dl(label) {
-    @url(protocol, port, path)&nbsp;@Config.getFromConf(path+".passw", "(%s)","")
+    @url(protocol, ip, port, path)&nbsp;@Config.getFromConf(path+".passw", "(%s)","")
 }
