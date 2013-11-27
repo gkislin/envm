@@ -12,6 +12,8 @@
         </form>
     }
     <hr>
+    @dlUrl("Monitor", "http", vhost.accessIp, vhost.tomcatPort, "monitor")
+    <hr>
     @dlUrl("Tomcat Manager", "http", vhost.accessIp, vhost.tomcatPort, "manager")
     @dlUrl("Logs", "http", vhost.accessIp, vhost.tomcatPort, "logs")
     @dlUrl("Bonita", "http", vhost.accessIp, vhost.tomcatPort, "bonita")
@@ -22,9 +24,16 @@
                 <option value="mail">Mail</option>
                 <option value="attach">Attach</option>
                 <option value="scheduler">Scheduler</option>
+                <option value="Cominvest">Cominvest</option>
             </select>&nbsp;&nbsp;config</label>
         </dt>
         <dd id="config"></dd>
+    </dl>
+    <dl>
+        <dt>
+           <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reload</label>
+        </dt>
+        <dd id="reload"></dd>
     </dl>
 
     <hr>
@@ -50,6 +59,9 @@
         select.change(function() {
             var href="@Env.url("http", vhost.accessIp, vhost.tomcatPort, "")" + this.value + "/config";
             $("#config").html("<a href='"+href+"' target='_blank'>"+href+"</a>");
+            href = href+"?reload=true";
+            $("#reload").html("<a href='"+href+"' target='_blank'>"+href+"</a>");
+
         });
         select.change();
         var dbsName = $("#dbsName");
