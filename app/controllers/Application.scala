@@ -28,7 +28,7 @@ object Application extends Controller {
     tuple(
       "login" -> text,
       "password" -> text
-    ) verifying("Invalid login or password", result => result match {
+    ) verifying("Invalid login or password", {
       case (login, password) => User.authenticate(login, password)
     })
   )
@@ -48,7 +48,7 @@ object Application extends Controller {
     implicit request =>
       loginForm.bindFromRequest.fold(
         formWithErrors => BadRequest(html.login(TITLE, formWithErrors)),
-        user => Redirect(routes.Projects.index).withSession("login" -> user._1)
+        user => Redirect(routes.Projects.index()).withSession("login" -> user._1)
       )
   }
 
@@ -56,7 +56,7 @@ object Application extends Controller {
    * Logout and clean the session.
    */
   def logout = Action {
-    Redirect(routes.Application.login).withNewSession.flashing(
+    Redirect(routes.Application.login()).withNewSession.flashing(
       "success" -> "You've been logged out"
     )
   }
@@ -72,9 +72,10 @@ object Application extends Controller {
     )
   }
 
-  def vhostDetail(serverName: String, name: String) = Action {
+  def vhostDetail(serverName: String, name: String, isVpn: String) = Action {
     Ok(
-      html.vhostDetail(Env.vhost(serverName, name)))
+      html.vhostDetail(Env.vhost(serverName, name), isVpn=="1")
+    )
   }
 
   def servers = Action {
@@ -129,11 +130,15 @@ object Application extends Controller {
       ).as(JAVASCRIPT)
   }
 
+  val svnLogin = Config.get("svn.login", "login")
+  val svnPsw = Config.get("svn.password", "password")
+  val svnUrl = Config.get("svn.url", "http://svn.com")
+
   def bpByName(name: String, dir: String, ext: String) = Action {
     Async {
-      val fullDir = s"http://svn.com/$dir/"
+      val fullDir = s"$svnUrl/$dir/"
       WS.url(fullDir).
-        withAuth("login", "password", Realm.AuthScheme.BASIC).get().map {
+        withAuth(svnLogin, svnPsw, Realm.AuthScheme.BASIC).get().map {
         response => {
           val pattern = s"$name$ext".r
           pattern findFirstIn response.body match {
@@ -164,7 +169,7 @@ trait Secured {
   /**
    * Redirect to login if the user in not authorized.
    */
-  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login)
+  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login())
 
   /**
    * Action for authenticated users.

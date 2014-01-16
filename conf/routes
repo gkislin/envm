@@ -25,7 +25,7 @@ GET     /server/:serverName                   controllers.Application.serverDeta
 GET     /vhosts/:serverName                   controllers.Application.vhosts(serverName)
 
 # VHostDetail detail
-GET     /vhost/:serverName/:name              controllers.Application.vhostDetail(serverName, name)
+GET     /vhost/:serverName/:name/:isVpn       controllers.Application.vhostDetail(serverName, name, isVpn)
 
 # Put version
 GET     /conf/:name                           controllers.Application.setHostVersion(name, version)

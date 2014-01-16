@@ -40,28 +40,20 @@
             $("#vhostTable").jqGrid({
                 datatype: "local",
                 height: 'auto',
-                colNames:['Name','Description', 'AppVersion',''],
+                colNames:['Name','Description', 'Vpn', '','','AppVersion',''],
                 colModel:[
                     {name:'name',index:'name', width:80},
                     {name:'descr',index:'descr', width:280},
+                    { name: 'vpn', index: 'vpn',
+                    editable:true, edittype:'checkbox', editoptions: { value:"1:0"},
+                    formatter: "checkbox", width:25},
+                    {name:'isIp', hidden: true},
+                    {name:'isVpn',hidden: true},
                     {name:'version',index:'version', width:100},
                     {name:'serverName',hidden: true}
                 ],
                 caption: "Окружения",
-                onSelectRow: function(id){
-                    if(id && id!==lastVhostSel){
-                       $(this).restoreRow(lastVhostSel);
-                       lastVhostSel=id;
-                       var serverName = $(this).getRowData(lastVhostSel)['serverName'];
-                       var vhostName = $(this).getRowData(lastVhostSel)['name'];
-                       jsRoutes.controllers.Application.vhostDetail(serverName, vhostName).ajax({
-                            success: function(data) {
-                                $("#vhostDetail").html(data);
-                            },
-                            error: showVhostError
-                       });
-                    }
-                }
+                onSelectRow: vhostTableSelectRow
             });
             $("#reloadVHostBtn").click(function(){
                 $.get("@routes.Application.reload()", "",
@@ -71,6 +63,24 @@
             loadVHostGrid();
         });
 
+        function vhostTableSelectRow(id){
+            if(id && id!==lastVhostSel){
+                var vhostTable = $("#vhostTable");
+                vhostTable.restoreRow(lastVhostSel);
+                lastVhostSel=id;
+                var rowData = vhostTable.getRowData(lastVhostSel);
+                var serverName = rowData['serverName'];
+                var vhostName = rowData['name'];
+                var isVpn = rowData['vpn'];
+                jsRoutes.controllers.Application.vhostDetail(serverName, vhostName, isVpn).ajax({
+                    success: function(data) {
+                        $("#vhostDetail").html(data);
+                    },
+                    error: showVhostError
+                });
+            }
+        }
+
         function reloadServerGrid(gridData){
             gridData.push({ name:"All", descr:"Все Окружения" });
             reloadGrid("#serverTable", gridData);
@@ -78,12 +88,28 @@
             $("#vhosts").hide();
             lastServerSel = -1;
         }
+
         function loadVHostGrid(){
             jsRoutes.controllers.Application.vhosts(serverName).ajax({
             success: function(gridData) {
                 $("#vhostDetail").empty();
                 lastVhostSel = -1;
                 reloadGrid("#vhostTable", gridData);
+                var vhostTable = $("#vhostTable");
+                var listIds = vhostTable.getDataIDs();
+                for (var i = 0; i < listIds.length; i++) {
+                    var rowId = listIds[i];
+                    rowData=vhostTable.getRowData(rowId);
+                    var chbx = vhostTable.find('#'+rowId+' input[type=checkbox]');
+                    if(rowData.isVpn == "1") {
+                        chbx.prop('checked',true);
+                    }
+                    chbx.prop('disabled',(rowData.isVpn != "1" || rowData.isIp != "1"));
+                    chbx.change(function(){
+                        lastVhostSel = -1;
+                        vhostTable.setSelection(this.parentNode.parentNode.id, true);
+                    });
+                }
                 $("#vhosts").show()
             },
             error: showVhostError

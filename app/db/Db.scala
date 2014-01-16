@@ -16,7 +16,7 @@ object Db {
   Class.forName("org.postgresql.Driver").newInstance
 
   def getConnection(vhost: VHost) = {
-    getConnectionByUrl(Env.psqlExt(vhost))
+    getConnectionByUrl(Env.psqlExt(vhost, vhost.vpnIp!=None))
   }
 
   def getConnectionByUrl(url: String) = {

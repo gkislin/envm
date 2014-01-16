@@ -10,12 +10,14 @@
         }
         <hr>
     }
-    @dl("SSH") {
-        @Env.ssh(server)
+    @if(server.ip != None) {
+        @dl("SSH") {
+            @Env.ssh(server)
+        }
     }
     @if(server.name == "river") {
         <hr>
-        @dlUrl("Jenkins", "http", env.accessIp, 8080, "jenkins")
-        @dlUrl("Tomcat Manager", "http", env.accessIp, 8080, "manager")
-    }
+            @dlUrl("Jenkins", "http", env.accessIp, 8080, "jenkins")
+            @dlUrl("Tomcat Manager", "http", env.accessIp, 8080, "manager")
+        }
 </div>

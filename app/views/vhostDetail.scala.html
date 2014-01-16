@@ -1,22 +1,22 @@
-@(vhost: VHost)
+@(vhost: VHost, isVpn: Boolean)
 
 @import common._
 @import util.Config
 
 <div id="detailEnv" class="detail">
-    @dlUrl(vhost.ctxValue.capitalize, "http", vhost.accessIp, vhost.tomcatPort, vhost.ctxValue)
+    @dlUrl(vhost.ctxValue.capitalize, "http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), vhost.ctxValue)
     @defining(Config.getLoginPassw(vhost.ctxValue, Some(vhost))) { tuple =>
-        <form action='@Env.url("http", vhost.accessIp, vhost.tomcatPort, s"${vhost.ctxValue}/j_acegi_security_check")' method='post' target="_blank">
+        <form action='@Env.url("http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), s"${vhost.ctxValue}/j_acegi_security_check")' method='post' target="_blank">
          <input name="j_username" value="@tuple._1"><br>
          <input name="j_password" value="@tuple._2"><input type="submit" value="Login">
         </form>
     }
     <hr>
-    @dlUrl("Monitor", "http", vhost.accessIp, vhost.tomcatPort, "monitor")
+    @dlUrl("Monitor", "http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), "monitor")
     <hr>
-    @dlUrl("Tomcat Manager", "http", vhost.accessIp, vhost.tomcatPort, "manager")
-    @dlUrl("Logs", "http", vhost.accessIp, vhost.tomcatPort, "logs")
-    @dlUrl("Bonita", "http", vhost.accessIp, vhost.tomcatPort, "bonita")
+    @dlUrl("Tomcat Manager", "http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), "manager")
+    @dlUrl("Logs", "http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), "logs")
+    @dlUrl("Bonita", "http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), "bonita")
     <dl>
         <dt><label>
             <select id="config_app" style="width:90px">
@@ -37,27 +37,29 @@
     </dl>
 
     <hr>
-    @dlUrl("WSO2 manager", "https", vhost.accessIp, vhost.wso2Port, "carbon")
-    <dl>
-        <dt><label>
-            Wso2 DBS: <input type="text" id="dbsName" value="OrgUnit" size="13"/></label>
-        </dt>
-        <dd id="wsdl"></dd>
-    </dl>
-    <hr>
+    @if(vhost.wso2 != None) {
+        @dlUrl("WSO2 manager", "https", vhost.accessIp(isVpn), vhost.wso2.get, "carbon")
+        <dl>
+            <dt><label>
+                Wso2 DBS: <input type="text" id="dbsName" value="OrgUnit" size="13"/></label>
+            </dt>
+            <dd id="wsdl"></dd>
+        </dl>
+        <hr>
+    }
     @dl("PgSql") {
-        <a href='@routes.Application.browseDB(vhost.name)' target="_blank">@Env.psql(vhost)</a>&nbsp;@Config.getFromConf("psql.passw", "(%s)","", Some(vhost))
+        <a href='@routes.Application.browseDB(vhost.name)' target="_blank">@Env.psql(vhost, isVpn)</a>&nbsp;@Config.getFromConf("psql.passw", "(%s)","", Some(vhost))
     }
     <hr>
     @dl("SSH"){
-        @Env.ssh(vhost)
+        @Env.ssh(vhost, isVpn)
     }
 </div>
 <script>
     $("#detailEnv").ready(function() {
         var select= $("#config_app");
         select.change(function() {
-            var href="@Env.url("http", vhost.accessIp, vhost.tomcatPort, "")" + this.value + "/config";
+            var href="@Env.url("http", vhost.accessIp(isVpn), vhost.tomcatPort(isVpn), "")" + this.value + "/config";
             $("#config").html("<a href='"+href+"' target='_blank'>"+href+"</a>");
             href = href+"?reload=true";
             $("#reload").html("<a href='"+href+"' target='_blank'>"+href+"</a>");
@@ -66,7 +68,7 @@
         select.change();
         var dbsName = $("#dbsName");
         dbsName.keyup(function() {
-            var href="@Env.url("http", vhost.accessIp, vhost.wsdlPort, "")" + "services/" + this.value;
+            var href="@Env.url("http", vhost.accessIp(isVpn), vhost.wsdlPort(isVpn), "")" + "services/" + this.value;
             var tryItRef = href+"?tryit";
             var wsdlRef = href+"?wsdl";
             $("#wsdl").html("TryIt:&nbsp;&nbsp;<a href='"+tryItRef+"' target='_blank'>"+tryItRef+"</a><br>" +
