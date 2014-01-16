@@ -28,7 +28,7 @@ object Application extends Controller {
     tuple(
       "login" -> text,
       "password" -> text
-    ) verifying("Invalid login or password", {
+    ) verifying("Invalid login or password", result => result match {
       case (login, password) => User.authenticate(login, password)
     })
   )
@@ -48,7 +48,7 @@ object Application extends Controller {
     implicit request =>
       loginForm.bindFromRequest.fold(
         formWithErrors => BadRequest(html.login(TITLE, formWithErrors)),
-        user => Redirect(routes.Projects.index()).withSession("login" -> user._1)
+        user => Redirect(routes.Projects.index).withSession("login" -> user._1)
       )
   }
 
@@ -56,7 +56,7 @@ object Application extends Controller {
    * Logout and clean the session.
    */
   def logout = Action {
-    Redirect(routes.Application.login()).withNewSession.flashing(
+    Redirect(routes.Application.login).withNewSession.flashing(
       "success" -> "You've been logged out"
     )
   }
@@ -169,7 +169,7 @@ trait Secured {
   /**
    * Redirect to login if the user in not authorized.
    */
-  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login())
+  private def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Application.login)
 
   /**
    * Action for authenticated users.
