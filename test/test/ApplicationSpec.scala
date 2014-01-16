@@ -37,5 +37,18 @@ class ApplicationSpec extends Specification {
         contentType(home) must beSome.which(_ == "text/html")
       }
     }
+    "find pattern" in {
+      val body = """
+          <li><a href="bdg_payment--2.02.bar">bdg_payment--2.02.bar</a></li>
+          <li><a href="ecm_acts--2.7.bar">ecm_acts--2.7.bar</a></li>
+          <li><a href="ecm_agreements_close--1.2.bar">ecm_agreements_close--1.2.bar</a></li>
+          <li><a href="ecm_agreements_general--2.3.bar">ecm_agreements_general--2.3.bar</a></li>
+          <li><a href="ecm_authorities--2.3.bar">ecm_authorities--2.3.bar</a></li>
+        """.stripMargin
+      val name = "ecm_agreements_general"
+      val pattern = s"$name--.+?\\.bar".r
+      println(pattern findFirstIn body)
+      pattern findFirstIn body must beSome[String]
+    }
   } 
 }

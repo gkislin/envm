@@ -1,6 +1,5 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
@@ -14,6 +13,11 @@ import _root_.db.Browser
 import util.{JsonUtil, Config}
 import models.Env.extVhostFormat
 
+import play.api.libs.ws.WS
+import play.api.libs.concurrent.Execution.Implicits._
+import com.ning.http.client.Realm
+import play.api.Routes
+
 object Application extends Controller {
   private val ALL = "All"
   val TITLE: String = "Environment Manager"
@@ -24,7 +28,7 @@ object Application extends Controller {
     tuple(
       "login" -> text,
       "password" -> text
-    ) verifying ("Invalid login or password", result => result match {
+    ) verifying("Invalid login or password", result => result match {
       case (login, password) => User.authenticate(login, password)
     })
   )
@@ -32,18 +36,20 @@ object Application extends Controller {
   /**
    * Login page.
    */
-  def login = Action { implicit request =>
-    Ok(html.login(TITLE, loginForm))
+  def login = Action {
+    implicit request =>
+      Ok(html.login(TITLE, loginForm))
   }
 
   /**
    * Handle login form submission.
    */
-  def authenticate = Action { implicit request =>
-    loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.login(TITLE, formWithErrors)),
-      user => Redirect(routes.Projects.index).withSession("login" -> user._1)
-    )
+  def authenticate = Action {
+    implicit request =>
+      loginForm.bindFromRequest.fold(
+        formWithErrors => BadRequest(html.login(TITLE, formWithErrors)),
+        user => Redirect(routes.Projects.index).withSession("login" -> user._1)
+      )
   }
 
   /**
@@ -122,6 +128,27 @@ object Application extends Controller {
         )
       ).as(JAVASCRIPT)
   }
+
+  def bpByName(name: String, dir: String, ext: String) = Action {
+    Async {
+      val fullDir = s"http://svn.com/$dir/"
+      WS.url(fullDir).
+        withAuth("login", "password", Realm.AuthScheme.BASIC).get().map {
+        response => {
+          val pattern = s"$name$ext".r
+          pattern findFirstIn response.body match {
+            case Some(nameWithVersion) =>
+              Redirect(fullDir + nameWithVersion)
+            case None => BadRequest("Process with name '" + name + "' not found")
+          }
+        }
+      }
+    }
+  }
+
+  def procByName(name: String) = bpByName(name, "local_default_My%20Processes", "_diagram_.+?\\.proc")
+
+  def barByName(name: String) = bpByName(name, "barBonitaProcess", "--.+?\\.bar")
 }
 
 /**
@@ -142,7 +169,8 @@ trait Secured {
   /**
    * Action for authenticated users.
    */
-  def IsAuthenticated(f: => String => Request[AnyContent] => Result) = Security.Authenticated(username, onUnauthorized) { user =>
-    Action(request => f(user)(request))
+  def IsAuthenticated(f: => String => Request[AnyContent] => Result) = Security.Authenticated(username, onUnauthorized) {
+    user =>
+      Action(request => f(user)(request))
   }
 }

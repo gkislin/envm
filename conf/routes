@@ -1,7 +1,11 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET     /                                     controllers.Projects.index
+GET     /                                   controllers.Projects.index
+
+GET     /bar/:name                          controllers.Application.barByName(name)
+GET     /bp/:name                           controllers.Application.procByName(name)
+
 
 # Authentication
 GET     /login                              controllers.Application.login
