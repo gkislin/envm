@@ -40,15 +40,13 @@
             $("#vhostTable").jqGrid({
                 datatype: "local",
                 height: 'auto',
-                colNames:['Name','Description', 'Vpn', '','','AppVersion',''],
+                colNames:['Name','Description', 'Vpn','AppVersion',''],
                 colModel:[
                     {name:'name',index:'name', width:80},
                     {name:'descr',index:'descr', width:280},
                     { name: 'vpn', index: 'vpn',
                     editable:true, edittype:'checkbox', editoptions: { value:"1:0"},
                     formatter: "checkbox", width:25},
-                    {name:'isIp', hidden: true},
-                    {name:'isVpn',hidden: true},
                     {name:'version',index:'version', width:100},
                     {name:'serverName',hidden: true}
                 ],
@@ -101,10 +99,10 @@
                     var rowId = listIds[i];
                     rowData=vhostTable.getRowData(rowId);
                     var chbx = vhostTable.find('#'+rowId+' input[type=checkbox]');
-                    if(rowData.isVpn == "1") {
-                        chbx.prop('checked',true);
-                    }
-                    chbx.prop('disabled',(rowData.isVpn != "1" || rowData.isIp != "1"));
+
+                    var data = gridData[rowId-1];
+                    chbx.prop('checked',data.isVpn);
+                    chbx.prop('disabled',(!data.isVpn || !data.isIp));
                     chbx.change(function(){
                         lastVhostSel = -1;
                         vhostTable.setSelection(this.parentNode.parentNode.id, true);

@@ -54,10 +54,8 @@ object Env {
     serversJson = JsonUtil.toJsonStr(env.servers)
     extVHosts =
       for (server <- env.servers; vhost <- server.vhosts)
-      yield ExtVHost(vhost.name, vhost.descr, boolConvert(vhost.ip), boolConvert(vhost.vpnIp), getVersion(vhost.name), server.name)
+      yield ExtVHost(vhost.name, vhost.descr, vhost.ip != None, vhost.vpnIp != None, getVersion(vhost.name), server.name)
   }
-
-  def boolConvert(op: Option[String]): String = if (op == None) "0" else "1"
 }
 
 
@@ -110,5 +108,5 @@ case class VHost(name: String, descr: String,
   def wsdlPort(isVpn: Boolean) = if (isVpn) Env.env.wsdl else wsdl.getOrElse(Env.env.wsdl)
 }
 
-case class ExtVHost(name: String, descr: String, isIp: String, isVpn: String,
+case class ExtVHost(name: String, descr: String, isIp: Boolean, isVpn: Boolean,
                     var version: String, serverName: String)
